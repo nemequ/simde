@@ -25,11 +25,8 @@
 #include <test/x86/test-sse2.h>
 #include <simde/x86/sse4.2.h>
 
-static MunitResult
-test_simde_mm_cmpestra_ranges_8(const MunitParameter params[], void* data) {
-  (void) params;
-  (void) data;
-
+static int
+test_simde_mm_cmpestra_ranges_8(SIMDE_MUNIT_TEST_ARGS) {
   const struct {
     simde__m128i a;
     int la;
@@ -51,12 +48,11 @@ test_simde_mm_cmpestra_ranges_8(const MunitParameter params[], void* data) {
   };
 
   for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])); i++) {
-    int r;
-    r = simde_mm_cmpestra(test_vec[i].a, test_vec[i].la, test_vec[i].b, test_vec[i].lb, 36);
-    munit_assert_int(r, ==, test_vec[i].r);
+    int r = simde_mm_cmpestra(test_vec[i].a, test_vec[i].la, test_vec[i].b, test_vec[i].lb, 36);
+    simde_assert_equal_i(r, test_vec[i].r);
   }
 
-  return MUNIT_OK;
+  return 0;
 }
 
 static int
