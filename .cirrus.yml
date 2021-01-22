@@ -1,0 +1,24 @@
+container:
+  image: debian:testing-slim
+
+task:
+  name: Sanitizers
+  skip: $BRANCH == "master" || ($BRANCH != 'ci/cirrus' && $BRANCH =~ '^ci/.+')
+  env:
+    CC: clang
+    CXX: clang++
+    CFLAGS: -Wextra -Werror -march=native
+    CXXFLAGS: -Wextra -Werror -march=native
+  system_info_script:
+  - cat /proc/cpuinfo
+  - cat /proc/meminfo
+  install_dependencies_script:
+    - apt-get update
+    - apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel gcovr clang
+    - pip3 install meson
+  configure_script:
+    - /usr/local/bin/meson setup build -Db_coverage=true -Db_sanitize=address,undefined
+  build_script:
+    - ninja -C build -v -j 3
+  test_script:
+    - ninja -C build -v test

@@ -373,8 +373,13 @@ int simde_mm_cmpestrz (simde__m128i a, int la, simde__m128i b, int lb, const int
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128i
 simde_mm_cmpgt_epi64 (simde__m128i a, simde__m128i b) {
-  #if defined(SIMDE_X86_SSE4_2_NATIVE)
+  #if defined(SIMDE_X86_SSE4_2_NATIVE) && 0
     return _mm_cmpgt_epi64(a, b);
+  #elif defined(SIMDE_X86_SSE2_NATIVE)
+    /* https://stackoverflow.com/a/65175746/501126 */
+    __m128i r = _mm_and_si128(_mm_cmpeq_epi32(a, b), _mm_sub_epi64(b, a));
+    r = _mm_or_si128(r, _mm_cmpgt_epi32(a, b));
+    return _mm_shuffle_epi32(r, _MM_SHUFFLE(3, 3, 1, 1));
   #else
     simde__m128i_private
       r_,
@@ -384,31 +389,8 @@ simde_mm_cmpgt_epi64 (simde__m128i a, simde__m128i b) {
     #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
       r_.neon_u64 = vcgtq_s64(a_.neon_i64, b_.neon_i64);
     #elif defined(SIMDE_ARM_NEON_A32V7_NATIVE)
-      // ARMv7 lacks vcgtq_s64.
-      // This is based off of Clang's SSE2 polyfill:
-      // (a > b) -> ((a_hi > b_hi) || (a_lo > b_lo && a_hi == b_hi))
-
-      // Mask the sign bit out since we need a signed AND an unsigned comparison
-      // and it is ugly to try and split them.
-      int32x4_t mask   = vreinterpretq_s32_s64(vdupq_n_s64(0x80000000ull));
-      int32x4_t a_mask = veorq_s32(a_.neon_i32, mask);
-      int32x4_t b_mask = veorq_s32(b_.neon_i32, mask);
-      // Check if a > b
-      int64x2_t greater = vreinterpretq_s64_u32(vcgtq_s32(a_mask, b_mask));
-      // Copy upper mask to lower mask
-      // a_hi > b_hi
-      int64x2_t gt_hi = vshrq_n_s64(greater, 63);
-      // Copy lower mask to upper mask
-      // a_lo > b_lo
-      int64x2_t gt_lo = vsliq_n_s64(greater, greater, 32);
-      // Compare for equality
-      int64x2_t equal = vreinterpretq_s64_u32(vceqq_s32(a_mask, b_mask));
-      // Copy upper mask to lower mask
-      // a_hi == b_hi
-      int64x2_t eq_hi = vshrq_n_s64(equal, 63);
-      // a_hi > b_hi || (a_lo > b_lo && a_hi == b_hi)
-      int64x2_t ret = vorrq_s64(gt_hi, vandq_s64(gt_lo, eq_hi));
-      r_.neon_i64 = ret;
+      /* https://stackoverflow.com/a/65223269/501126 */
+      r_.neon_i64 = vshrq_n_s64(vqsubq_s64(b_.neon_i64, a_.neon_i64), 63);
     #elif defined(SIMDE_POWER_ALTIVEC_P8_NATIVE)
       r_.altivec_u64 = HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned long long), vec_cmpgt(a_.altivec_i64, b_.altivec_i64));
     #elif defined(SIMDE_VECTOR_SUBSCRIPT_OPS)

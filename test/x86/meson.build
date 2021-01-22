@@ -11,7 +11,8 @@ simde_test_x86_tests = [
   'fma',
   'gfni',
   'clmul',
-  'svml'
+  'svml',
+  'xop'
 ]
 
 subdir('avx512')

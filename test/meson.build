@@ -62,6 +62,8 @@ if not c_openmp_simd
   simde_deps += dependency('openmp', required: false)
 endif
 
+simde_deps += cc.find_library('m', required: false)
+
 simde_include_dir = include_directories('..')
 
 subdir('common')

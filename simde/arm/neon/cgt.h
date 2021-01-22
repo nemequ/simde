@@ -211,8 +211,15 @@ simde_uint64x2_t
 simde_vcgtq_s64(simde_int64x2_t a, simde_int64x2_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vcgtq_s64(a, b);
+  #elif defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vreinterpretq_u64_s64(vshrq_n_s64(vqsubq_s64(b, a), 63));
   #elif defined(SIMDE_X86_SSE4_2_NATIVE)
     return _mm_cmpgt_epi64(a, b);
+  #elif defined(SIMDE_X86_SSE2_NATIVE)
+    /* https://stackoverflow.com/a/65175746/501126 */
+    __m128i r = _mm_and_si128(_mm_cmpeq_epi32(a, b), _mm_sub_epi64(b, a));
+    r = _mm_or_si128(r, _mm_cmpgt_epi32(a, b));
+    return _mm_shuffle_epi32(r, _MM_SHUFFLE(3,3,1,1));
   #elif defined(SIMDE_POWER_ALTIVEC_P8_NATIVE)
     return HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned long long), vec_cmpgt(a, b));
   #else

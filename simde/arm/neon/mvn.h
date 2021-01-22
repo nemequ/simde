@@ -41,6 +41,8 @@ simde_int8x16_t
 simde_vmvnq_s8(simde_int8x16_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmvnq_s8(a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, a, a, 0x55);
   #elif defined(SIMDE_X86_SSE2_NATIVE)
     return _mm_andnot_si128(a, _mm_cmpeq_epi8(a, a));
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
@@ -74,6 +76,8 @@ simde_int16x8_t
 simde_vmvnq_s16(simde_int16x8_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmvnq_s16(a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, a, a, 0x55);
   #elif defined(SIMDE_X86_SSE2_NATIVE)
     return _mm_andnot_si128(a, _mm_cmpeq_epi16(a, a));
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
@@ -107,6 +111,8 @@ simde_int32x4_t
 simde_vmvnq_s32(simde_int32x4_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmvnq_s32(a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, a, a, 0x55);
   #elif defined(SIMDE_X86_SSE2_NATIVE)
     return _mm_andnot_si128(a, _mm_cmpeq_epi32(a, a));
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
@@ -140,6 +146,8 @@ simde_uint8x16_t
 simde_vmvnq_u8(simde_uint8x16_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmvnq_u8(a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, a, a, 0x55);
   #elif defined(SIMDE_X86_SSE2_NATIVE)
     return _mm_andnot_si128(a, _mm_cmpeq_epi8(a, a));
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
@@ -173,6 +181,8 @@ simde_uint16x8_t
 simde_vmvnq_u16(simde_uint16x8_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmvnq_u16(a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, a, a, 0x55);
   #elif defined(SIMDE_X86_SSE2_NATIVE)
     return _mm_andnot_si128(a, _mm_cmpeq_epi16(a, a));
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
@@ -206,6 +216,8 @@ simde_uint32x4_t
 simde_vmvnq_u32(simde_uint32x4_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmvnq_u32(a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, a, a, 0x55);
   #elif defined(SIMDE_X86_SSE2_NATIVE)
     return _mm_andnot_si128(a, _mm_cmpeq_epi32(a, a));
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)

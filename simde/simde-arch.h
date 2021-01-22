@@ -254,6 +254,9 @@
 #  if defined(__SSE4_2__)
 #    define SIMDE_ARCH_X86_SSE4_2 1
 #  endif
+#  if defined(__XOP__)
+#    define SIMDE_ARCH_X86_XOP 1
+#  endif
 #  if defined(__AVX__)
 #    define SIMDE_ARCH_X86_AVX 1
 #    if !defined(SIMDE_ARCH_X86_SSE3)

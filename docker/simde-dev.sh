@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# See documentation in README.md
+
 DOCKER="$(command -v podman || command -v docker)"
 
 DOCKER_DIR="$(dirname "${0}")"
@@ -26,7 +28,19 @@ elif [ "${OSTYPE}" == "darwin" ]; then
 fi
 
 if [ "${OSTYPE}" == "darwin" ]; then
-  "${DOCKER}" run --mount type=bind,source="$(realpath "${DOCKER_DIR}/..")",target=/usr/local/src/simde ${CAPABILITIES} --rm -it "${IMAGE_NAME}" /bin/bash
+  if [ -z "${PERSISTENT_BUILD_DIR}" ]; then
+    PERSISTENT_BUILD_ARGS="";
+  else
+    PERSISTENT_BUILD_DIR="$(realpath "${PERSISTENT_BUILD_DIR}")"
+    PERSISTENT_BUILD_ARGS="--mount type=bind,source=\"${PERSISTENT_BUILD_DIR}\",target=/opt/simde"
+  fi
+  "${DOCKER}" run --mount type=bind,source="$(realpath "${DOCKER_DIR}/..")",target=/usr/local/src/simde ${PERSISTENT_BUILD_ARGS} ${CAPABILITIES} --rm -it "${IMAGE_NAME}" /bin/bash
 else
-  "${DOCKER}" run -v "$(realpath "${DOCKER_DIR}/..")":/usr/local/src/simde${VOLUME_OPTIONS} ${CAPABILITIES} --rm -it "${IMAGE_NAME}" /bin/bash
+  if [ -z "${PERSISTENT_BUILD_DIR}" ]; then
+    PERSISTENT_BUILD_ARGS="";
+  else
+    PERSISTENT_BUILD_DIR="$(realpath "${PERSISTENT_BUILD_DIR}")"
+    PERSISTENT_BUILD_ARGS="-v \"${PERSISTENT_BUILD_DIR}\":/opt/simde${VOLUME_OPTIONS}"
+  fi
+  "${DOCKER}" run -v "$(realpath "${DOCKER_DIR}/..")":/usr/local/src/simde${VOLUME_OPTIONS} ${PERSISTENT_BUILD_ARGS} ${CAPABILITIES} --rm -it "${IMAGE_NAME}" /bin/bash
 fi

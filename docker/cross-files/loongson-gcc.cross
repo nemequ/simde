@@ -1,0 +1,18 @@
+[binaries]
+c = '/usr/bin/mips64el-linux-gnuabi64-gcc'
+cpp = '/usr/bin/mips64el-linux-gnuabi64-g++'
+ar = '/usr/bin/mips64el-linux-gnuabi64-ar'
+strip = '/usr/bin/mips64el-linux-gnuabi64-strip'
+objcopy = '/usr/bin/mips64el-linux-gnuabi64-objcopy'
+ld = '/usr/bin/mips64el-linux-gnuabi64-ld'
+exe_wrapper = ['qemu-mips64el-static', '-cpu', 'Loongson-3A4000']
+
+[properties]
+c_args = ['-march=loongson3a']
+cpp_args = ['-march=loongson3a']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'mips64el'
+cpu = 'mips64el'
+endian = 'little'

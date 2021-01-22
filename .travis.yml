@@ -1,187 +1,168 @@
 language: c
 dist: bionic
 cache: ccache
-branches:
-  except:
-    - /^(wip\/)?(appveyor|drone|gh\-actions|azure|circleci)(\-.+)?$/
 
-env:
-  global:
-  - ARCH_FLAGS="-march=native"
-  - BUILD_CPP_TESTS=ON
-  - CMAKE_GENERATOR='Ninja'
-  - RUN_TESTS=true
-  - OPTIMIZATION_FLAGS=''
-  - DIAGNOSTIC_FLAGS='-Wall -Wextra -Werror'
-  - TEST_ARG_SEPARATOR=""
+# env:
+#   global:
+#   - ARCH_FLAGS="-march=native"
+#   - BUILD_CPP_TESTS=ON
+#   - CMAKE_GENERATOR='Ninja'
+#   - RUN_TESTS=true
+#   - OPTIMIZATION_FLAGS=''
+#   - DIAGNOSTIC_FLAGS='-Wall -Wextra -Werror'
+#   - TEST_ARG_SEPARATOR=""
+
 jobs:
   include:
-  - name: "gcc-8 x86"
-    if: branch != master OR type == pull_request
-    arch: amd64
-    compiler: gcc-8
-    env:
-    - C_COMPILER=gcc-8
-    - CXX_COMPILER=g++-8
-    - ARCH_FLAGS="-m32"
-    addons:
-      apt:
-        packages:
-        - libc6:i386
-        - libc6-dev:i386
-        - gcc-8:i386
-        - g++-8:i386
-        - cpp-8:i386
-        - binutils:i386
-        - binutils-i686-linux-gnu:i386
+  # - name: "gcc-8 x86"
+  #   if: branch != master OR type == pull_request
+  #   arch: amd64
+  #   compiler: gcc-8
+  #   env:
+  #   - C_COMPILER=gcc-8
+  #   - CXX_COMPILER=g++-8
+  #   - ARCH_FLAGS="-m32"
+  #   addons:
+  #     apt:
+  #       packages:
+  #       - libc6:i386
+  #       - libc6-dev:i386
+  #       - gcc-8:i386
+  #       - g++-8:i386
+  #       - cpp-8:i386
+  #       - binutils:i386
+  #       - binutils-i686-linux-gnu:i386
 
-  - name: "aarch64"
-    if: branch != master OR type == pull_request
-    arch: arm64
-    compiler: gcc-10
-    env:
-    - C_COMPILER=gcc-10
-    - CXX_COMPILER=g++-10
-    - ARCH_FLAGS="-march=armv8-a+simd+crc"
-    - OPTIMIZATION_FLAGS="-O1"
-    addons:
-      apt:
-        sources:
-        - sourceline: "ppa:ubuntu-toolchain-r/test"
-          key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x60c317803a41ba51845e371a1e9377a2ba9ef27f
-        packages:
-        - gcc-10
-        - g++-10
+  # - name: "aarch64"
+  #   if: branch != master OR type == pull_request
+  #   arch: arm64
+  #   compiler: gcc-10
+  #   env:
+  #   - C_COMPILER=gcc-10
+  #   - CXX_COMPILER=g++-10
+  #   - ARCH_FLAGS="-march=armv8-a+simd+crc"
+  #   - OPTIMIZATION_FLAGS="-O1"
+  #   addons:
+  #     apt:
+  #       sources:
+  #       - sourceline: "ppa:ubuntu-toolchain-r/test"
+  #         key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x60c317803a41ba51845e371a1e9377a2ba9ef27f
+  #       packages:
+  #       - gcc-10
+  #       - g++-10
 
-  - name: "ppc64le"
-    if: branch != master OR type == pull_request
-    arch: ppc64le
-    compiler: gcc-10
-    env:
-    - ARCH_FLAGS="-mcpu=native"
-    - C_COMPILER=gcc-10
-    - CXX_COMPILER=g++-10
-    - OPTIMIZATION_FLAGS=-O2
-    addons:
-      apt:
-        packages:
-        - gcc-10
-        - g++-10
-    addons:
-      apt:
-        sources:
-        - sourceline: "ppa:ubuntu-toolchain-r/test"
-          key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x60c317803a41ba51845e371a1e9377a2ba9ef27f
-        packages:
-        - gcc-10
-        - g++-10
+  # - name: "ppc64le"
+  #   if: branch != master OR type == pull_request
+  #   arch: ppc64le
+  #   compiler: gcc-10
+  #   env:
+  #   - ARCH_FLAGS="-mcpu=native"
+  #   - C_COMPILER=gcc-10
+  #   - CXX_COMPILER=g++-10
+  #   - OPTIMIZATION_FLAGS=-O2
+  #   addons:
+  #     apt:
+  #       packages:
+  #       - gcc-10
+  #       - g++-10
+  #   addons:
+  #     apt:
+  #       sources:
+  #       - sourceline: "ppa:ubuntu-toolchain-r/test"
+  #         key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x60c317803a41ba51845e371a1e9377a2ba9ef27f
+  #       packages:
+  #       - gcc-10
+  #       - g++-10
 
-  - name: "MIPS Loongson-MMI (Compile Only)"
-    if: branch != master OR type == pull_request
-    arch: amd64
-    compiler: mips64el-linux-gnuabi64-gcc
-    env:
-    - C_COMPILER=mips64el-linux-gnuabi64-gcc
-    - CXX_COMPILER=mips64el-linux-gnuabi64-g++
-    - ARCH_FLAGS="-march=loongson3a"
-    - RUN_TESTS=false
-    addons:
-      apt:
-        packages:
-        - gcc-mips64el-linux-gnuabi64
-        - g++-mips64el-linux-gnuabi64
+  # - name: "MIPS Loongson-MMI (Compile Only)"
+  #   if: branch != master OR type == pull_request
+  #   arch: amd64
+  #   compiler: mips64el-linux-gnuabi64-gcc
+  #   env:
+  #   - C_COMPILER=mips64el-linux-gnuabi64-gcc
+  #   - CXX_COMPILER=mips64el-linux-gnuabi64-g++
+  #   - ARCH_FLAGS="-march=loongson3a"
+  #   - RUN_TESTS=false
+  #   addons:
+  #     apt:
+  #       packages:
+  #       - gcc-mips64el-linux-gnuabi64
+  #       - g++-mips64el-linux-gnuabi64
 
-  # These next two ere largely to detect missing AVX-512 functions
-  # since Travis is the only CI right now with AVX-512 hardware and SDE
-  # is too slow.
-  - name: "gcc-6"
-    dist: bionic
-    if: branch != master OR type == pull_request
-    env:
-    - C_COMPILER=gcc-6
-    - CXX_COMPILER=g++-6
-    addons:
-      apt:
-        packages:
-          - gcc-6
-          - g++-6
-
-  - name: "clang-3.5"
-    dist: xenial
-    if: branch != master OR type == pull_request
-    env:
-    - C_COMPILER=clang-3.5
-    - CXX_COMPILER=clang++-3.5
-    addons:
-      apt:
-        packages:
-          - clang-3.5
-
-  - name: icc
-    if: branch != master OR type == pull_request
-    compiler: icc
-    env:
-    - C_COMPILER=icc
-    - CXX_COMPILER=icpc
-    - DIAGNOSTIC_FLAGS='-wd13200 -wd13203 -wd16219 -Wall'
-    install:
-    - source /opt/intel/oneapi/compiler/latest/env/vars.sh
-    addons:
-      apt:
-        sources:
-        - sourceline: 'deb https://apt.repos.intel.com/oneapi all main'
-          key_url: 'https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB'
-        packages:
-        - intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
-
-  # - name: "pgcc"
+  # # These next two ere largely to detect missing AVX-512 functions
+  # # since Travis is the only CI right now with AVX-512 hardware and SDE
+  # # is too slow.
+  # - name: "gcc-6"
+  #   dist: bionic
   #   if: branch != master OR type == pull_request
   #   env:
-  #   - C_COMPILER=pgcc
-  #   - CXX_COMPILER=pgc++
-  #   - ARCH_FLAGS="-m64"
-  #   - BUILD_CPP_TESTS=OFF
-  #   - DIAGNOSTIC_FLAGS=
+  #   - C_COMPILER=gcc-6
+  #   - CXX_COMPILER=g++-6
+  #   addons:
+  #     apt:
+  #       packages:
+  #         - gcc-6
+  #         - g++-6
+
+  # - name: "clang-3.5"
+  #   dist: xenial
+  #   if: branch != master OR type == pull_request
+  #   env:
+  #   - C_COMPILER=clang-3.5
+  #   - CXX_COMPILER=clang++-3.5
+  #   addons:
+  #     apt:
+  #       packages:
+  #         - clang-3.5
+
+  # # - name: "pgcc"
+  # #   if: branch != master OR type == pull_request
+  # #   env:
+  # #   - C_COMPILER=pgcc
+  # #   - CXX_COMPILER=pgc++
+  # #   - ARCH_FLAGS="-m64"
+  # #   - BUILD_CPP_TESTS=OFF
+  # #   - DIAGNOSTIC_FLAGS=
+  # #   install:
+  # #   - curl 'https://raw.githubusercontent.com/nemequ/pgi-travis/master/install-pgi.sh' | /bin/sh
+
+  # - name: "xlc"
+  #   if: branch != master OR type == pull_request
+  #   arch: ppc64le
   #   install:
-  #   - curl 'https://raw.githubusercontent.com/nemequ/pgi-travis/master/install-pgi.sh' | /bin/sh
+  #   - wget -q https://public.dhe.ibm.com/software/server/POWER/Linux/xl-compiler/eval/ppc64le/ubuntu/public.gpg -O- | sudo apt-key add -
+  #   - echo "deb https://public.dhe.ibm.com/software/server/POWER/Linux/xl-compiler/eval/ppc64le/ubuntu/ ${TRAVIS_DIST} main" >> /etc/apt/sources.list
+  #   - sudo apt-get update
+  #   - export XLC_VERSION="$(apt-cache search '^xlc\.[0-9]+\.[0-9]+\.[0-9]+$' | awk '{ print substr($1, 5) }')"
+  #   - sudo apt-get install "xlc.${XLC_VERSION}" "xlc-license-community.${XLC_VERSION}"
+  #   - sudo /opt/ibm/xlC/${XLC_VERSION}/bin/xlc_configure <<< 1 >/dev/null
+  #   env:
+  #   - ARCH_FLAGS=-qarch=auto
+  #   - C_COMPILER=xlc
+  #   - CXX_COMPILER=xlc++
 
-  - name: "xlc"
-    if: branch != master OR type == pull_request
-    arch: ppc64le
-    install:
-    - wget -q https://public.dhe.ibm.com/software/server/POWER/Linux/xl-compiler/eval/ppc64le/ubuntu/public.gpg -O- | sudo apt-key add -
-    - echo "deb https://public.dhe.ibm.com/software/server/POWER/Linux/xl-compiler/eval/ppc64le/ubuntu/ ${TRAVIS_DIST} main" >> /etc/apt/sources.list
-    - sudo apt-get update
-    - export XLC_VERSION="$(apt-cache search '^xlc\.[0-9]+\.[0-9]+\.[0-9]+$' | awk '{ print substr($1, 5) }')"
-    - sudo apt-get install "xlc.${XLC_VERSION}" "xlc-license-community.${XLC_VERSION}"
-    - sudo /opt/ibm/xlC/${XLC_VERSION}/bin/xlc_configure <<< 1 >/dev/null
-    env:
-    - ARCH_FLAGS=-qarch=auto
-    - C_COMPILER=xlc
-    - CXX_COMPILER=xlc++
+  # - name: msvc x86_64
+  #   if: branch != master OR type == pull_request
+  #   os: windows
+  #   env:
+  #   - ARCH_FLAGS="/arch:AVX2"
+  #   - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+  #   - OPTIMIZATION_FLAGS="/Ox"
+  #   - DIAGNOSTIC_FLAGS="/W4 /WX"
 
-  - name: msvc x86_64
-    if: branch != master OR type == pull_request
-    os: windows
-    env:
-    - ARCH_FLAGS="/arch:AVX2"
-    - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
-    - OPTIMIZATION_FLAGS="/Ox"
-    - DIAGNOSTIC_FLAGS="/W4 /WX"
+  # - name: msvc arm
+  #   if: branch != master OR type == pull_request
+  #   os: windows
+  #   env:
+  #   - ARCH_FLAGS=""
+  #   - CMAKE_GENERATOR="Visual Studio 15 2017 ARM"
+  #   - RUN_TESTS=false
+  #   - OPTIMIZATION_FLAGS="/Ox"
+  #   - DIAGNOSTIC_FLAGS="/W4 /WX"
 
-  - name: msvc arm
-    if: branch != master OR type == pull_request
-    os: windows
-    env:
-    - ARCH_FLAGS=""
-    - CMAKE_GENERATOR="Visual Studio 15 2017 ARM"
-    - RUN_TESTS=false
-    - OPTIMIZATION_FLAGS="/Ox"
-    - DIAGNOSTIC_FLAGS="/W4 /WX"
-
-  - name: s390x
-    if: branch != master OR type == pull_request
-    arch: s390x
+  # - name: s390x
+  #   if: branch != master OR type == pull_request
+  #   arch: s390x
 
   ##
   ## Special builds to deploy from master
@@ -205,63 +186,63 @@ jobs:
     after_script:
     - git push -q "https://${NO_TESTS_TOKEN}@github.com/simd-everywhere/simde-no-tests" master
 
-  allow_failures:
-  - name: msvc x86
+#   allow_failures:
+#   - name: msvc x86
 
-before_install:
-- |
-  if [ "${CMAKE_GENERATOR}" = "Ninja" ]; then
-    case "${TRAVIS_OS_NAME}" in
-      "linux")
-        sudo apt-get install -y ninja-build parallel
-        ;;
-      "osx")
-        brew install ninja
-        ;;
-      "windows")
-        choco install ninja
-        ;;
-    esac
-  fi
+# before_install:
+# - |
+#   if [ "${CMAKE_GENERATOR}" = "Ninja" ]; then
+#     case "${TRAVIS_OS_NAME}" in
+#       "linux")
+#         sudo apt-get install -y ninja-build parallel
+#         ;;
+#       "osx")
+#         brew install ninja
+#         ;;
+#       "windows")
+#         choco install ninja
+#         ;;
+#     esac
+#   fi
 
-- cat /proc/cpuinfo || true
-- cat /proc/meminfo || true
+# - cat /proc/cpuinfo || true
+# - cat /proc/meminfo || true
 
-## If we use the matrix to set CC/CXX Travis overwrites the values,
-## so instead we use C/CXX_COMPILER, then copy the values to CC/CXX
-## here (after Travis has set CC/CXX).
-- |
-  if [ -n "${C_COMPILER}" ]; then
-    export CC="${C_COMPILER}"
-  fi
-  if [ -n "${CXX_COMPILER}" ]; then
-    export CXX="${CXX_COMPILER}"
-  fi
+# ## If we use the matrix to set CC/CXX Travis overwrites the values,
+# ## so instead we use C/CXX_COMPILER, then copy the values to CC/CXX
+# ## here (after Travis has set CC/CXX).
+# - |
+#   if [ -n "${C_COMPILER}" ]; then
+#     export CC="${C_COMPILER}"
+#   fi
+#   if [ -n "${CXX_COMPILER}" ]; then
+#     export CXX="${CXX_COMPILER}"
+#   fi
 
-script:
-- mkdir "${TRAVIS_BUILD_DIR}/test/build" && cd "${TRAVIS_BUILD_DIR}/test/build"
-- |
-  ${CONFIGURE_WRAPPER} cmake .. \
-    -G "${CMAKE_GENERATOR}" \
-    -DBUILD_CPP_TESTS=${BUILD_CPP_TESTS} \
-    -DCMAKE_CROSSCOMPILING_EMULATOR="${TEST_WRAPPER}" \
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-    -DCMAKE_C_FLAGS="${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${DIAGNOSTIC_FLAGS} ${COMPILER_FLAGS} ${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${DIAGNOSTIC_FLAGS} ${COMPILER_FLAGS} ${CXXFLAGS}" \
-    ${CMAKE_ARGS} || (cat CMakeFiles/CMakeError.log && false) && \
-  ${BUILD_WRAPPER} cmake --build .
-- |
-  if [ "${RUN_TESTS}" = "true" ]; then
-    if [ "windows" != "${TRAVIS_OS_NAME}" ]; then
-      if command -v parallel; then
-        ${TEST_WRAPPER} ./run-tests${EXECUTABLE_EXTENSION} --list | grep -oP '^/(x86|arm/neon)/([^\/]+)' | sort -u | xargs parallel ${TEST_WRAPPER} ./run-tests${EXECUTABLE_EXTENSION} ${TEST_ARG_SEPARATOR} {} ::: || exit 1
-      else
-        ${TEST_WRAPPER} ./run-tests${EXECUTABLE_EXTENSION} || exit 1
-      fi
-    else
-      ctest --output-on-failure --interactive-debug-mode 0 -C Debug -V || exit 1
-    fi
-  fi
+# script:
+# - mkdir "${TRAVIS_BUILD_DIR}/test/build" && cd "${TRAVIS_BUILD_DIR}/test/build"
+# - |
+#   ${CONFIGURE_WRAPPER} cmake .. \
+#     -G "${CMAKE_GENERATOR}" \
+#     -DBUILD_CPP_TESTS=${BUILD_CPP_TESTS} \
+#     -DCMAKE_CROSSCOMPILING_EMULATOR="${TEST_WRAPPER}" \
+#     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+#     -DCMAKE_C_FLAGS="${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${DIAGNOSTIC_FLAGS} ${COMPILER_FLAGS} ${CFLAGS}" \
+#     -DCMAKE_CXX_FLAGS="${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${DIAGNOSTIC_FLAGS} ${COMPILER_FLAGS} ${CXXFLAGS}" \
+#     ${CMAKE_ARGS} || (cat CMakeFiles/CMakeError.log && false) && \
+#   ${BUILD_WRAPPER} cmake --build .
+# - |
+#   if [ "${RUN_TESTS}" = "true" ]; then
+#     if [ "windows" != "${TRAVIS_OS_NAME}" ]; then
+#       if command -v parallel; then
+#         ${TEST_WRAPPER} ./run-tests${EXECUTABLE_EXTENSION} --list | grep -oP '^/(x86|arm/neon)/([^\/]+)' | sort -u | xargs parallel ${TEST_WRAPPER} ./run-tests${EXECUTABLE_EXTENSION} ${TEST_ARG_SEPARATOR} {} ::: || exit 1
+#       else
+#         ${TEST_WRAPPER} ./run-tests${EXECUTABLE_EXTENSION} || exit 1
+#       fi
+#     else
+#       ctest --output-on-failure --interactive-debug-mode 0 -C Debug -V || exit 1
+#     fi
+#   fi
 
 notifications:
   email: false

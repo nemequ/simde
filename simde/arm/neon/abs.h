@@ -34,6 +34,20 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
+int64_t
+simde_vabsd_s64(int64_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && (!defined(HEDLEY_GCC_VERSION) || HEDLEY_GCC_VERSION_CHECK(9,1,0))
+    return vabsd_s64(a);
+  #else
+    return a < 0 ? -a : a;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vabsd_s64
+  #define vabsd_s64(a) simde_vabsd_s64(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x2_t
 simde_vabs_f32(simde_float32x2_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)

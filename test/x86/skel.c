@@ -110,6 +110,46 @@ test_simde_mm_xxx_pd (SIMDE_MUNIT_TEST_ARGS) {
 }
 
 static int
+test_simde_mm_xxx_pd (SIMDE_MUNIT_TEST_ARGS) {
+#if 0
+  static const struct {
+    const simde_float64 a[2];
+    const simde_float64 b[2];
+    const simde_float64 r[2];
+  } test_vec[] = {
+    #if !defined(SIMDE_FAST_NANS)
+
+    #endif
+
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])) ; i++) {
+    simde__m128d a = simde_mm_loadu_pd(test_vec[i].a);
+    simde__m128d b = simde_mm_loadu_pd(test_vec[i].b);
+    simde__m128d r = simde_mm_xxx_pd(a, b);
+    simde_test_x86_assert_equal_f64x2(r, simde_mm_loadu_pd(test_vec[i].r), 1);
+  }
+
+  return 0;
+#else
+  fputc('\n', stdout);
+  simde_float64 values[8 * 2 * sizeof(simde__m128d)];
+  simde_test_x86_random_f64x2_full(8, 2, values, -1000.0, 1000.0, SIMDE_TEST_VEC_FLOAT_NAN);
+
+  for (size_t i = 0 ; i < 8 ; i++) {
+    simde__m128d a = simde_test_x86_random_extract_f64x2(i, 2, 0, values);
+    simde__m128d b = simde_test_x86_random_extract_f64x2(i, 2, 1, values);
+    simde__m128d r = simde_mm_xxx_pd(a, b);
+
+    simde_test_x86_write_f64x2(2, a, SIMDE_TEST_VEC_POS_FIRST);
+    simde_test_x86_write_f64x2(2, b, SIMDE_TEST_VEC_POS_MIDDLE);
+    simde_test_x86_write_f64x2(2, r, SIMDE_TEST_VEC_POS_LAST);
+  }
+  return 1;
+#endif
+}
+
+static int
 test_simde_mm_xxx_epi8 (SIMDE_MUNIT_TEST_ARGS) {
 #if 0
   static const struct {

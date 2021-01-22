@@ -228,6 +228,8 @@ simde_vbslq_f32(simde_uint32x4_t a, simde_float32x4_t b, simde_float32x4_t c) {
     return vbslq_f32(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_castsi128_ps(_mm_ternarylogic_epi32(a, _mm_castps_si128(b), _mm_castps_si128(c), 0xca));
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u32(a),
@@ -249,6 +251,8 @@ simde_vbslq_f64(simde_uint64x2_t a, simde_float64x2_t b, simde_float64x2_t c) {
     return vbslq_f64(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_castsi128_pd(_mm_ternarylogic_epi32(a, _mm_castpd_si128(b), _mm_castpd_si128(c), 0xca));
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u64(a),
@@ -269,6 +273,8 @@ simde_vbslq_s8(simde_uint8x16_t a, simde_int8x16_t b, simde_int8x16_t c) {
     return vbslq_s8(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = (a),
@@ -291,6 +297,8 @@ simde_vbslq_s16(simde_uint16x8_t a, simde_int16x8_t b, simde_int16x8_t c) {
     return wasm_v128_bitselect(b, c, a);
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
     return vec_sel(c, b, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u16(a),
@@ -311,6 +319,8 @@ simde_vbslq_s32(simde_uint32x4_t a, simde_int32x4_t b, simde_int32x4_t c) {
     return vbslq_s32(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u32(a),
@@ -331,6 +341,8 @@ simde_vbslq_s64(simde_uint64x2_t a, simde_int64x2_t b, simde_int64x2_t c) {
     return vbslq_s64(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u64(a),
@@ -353,6 +365,8 @@ simde_vbslq_u8(simde_uint8x16_t a, simde_uint8x16_t b, simde_uint8x16_t c) {
     return wasm_v128_bitselect(b, c, a);
   #elif defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
     return vec_sel(c, b, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     return simde_veorq_u8(c, simde_vandq_u8(simde_veorq_u8(c, b), a));
   #endif
@@ -369,6 +383,8 @@ simde_vbslq_u16(simde_uint16x8_t a, simde_uint16x8_t b, simde_uint16x8_t c) {
     return vbslq_u16(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u16(a),
@@ -389,6 +405,8 @@ simde_vbslq_u32(simde_uint32x4_t a, simde_uint32x4_t b, simde_uint32x4_t c) {
     return vbslq_u32(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u32(a),
@@ -409,6 +427,8 @@ simde_vbslq_u64(simde_uint64x2_t a, simde_uint64x2_t b, simde_uint64x2_t c) {
     return vbslq_u64(a, b, c);
   #elif defined(SIMDE_WASM_SIMD128_NATIVE)
     return wasm_v128_bitselect(b, c, a);
+  #elif defined(SIMDE_X86_AVX512VL_NATIVE)
+    return _mm_ternarylogic_epi32(a, b, c, 0xca);
   #else
     simde_uint8x16_t
       a_ = simde_vreinterpretq_u8_u64(a),

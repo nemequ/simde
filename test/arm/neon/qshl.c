@@ -7,6 +7,16 @@
 #include "../../../simde/arm/neon/neg.h"
 #include "../../../simde/arm/neon/shl.h"
 
+/* Until v12, clang used unsigned parameters on the scalar versions, so
+ * when testing we need to disable the -Wsign-conversion to avoid a
+ * diagnostic.  If this is a problem in your code you might want to
+ * consider using simde_vqshl* instead of vqshl* so you can avoid an
+ * ifdef. */
+
+#if HEDLEY_HAS_WARNING("-Wsign-conversion") && defined(SIMDE_NATIVE_ALIASES_TESTING)
+  #pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 static int
 test_simde_vqshlb_s8 (SIMDE_MUNIT_TEST_ARGS) {
 #if 1

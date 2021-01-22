@@ -40,7 +40,7 @@ SIMDE_BEGIN_DECLS_
 SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x2_t
 simde_vpadd_f32(simde_float32x2_t a, simde_float32x2_t b) {
-  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && !SIMDE_DETECT_CLANG_VERSION_NOT(9,0,0)
     return vpadd_f32(a, b);
   #else
     return simde_vadd_f32(simde_vuzp1_f32(a, b), simde_vuzp2_f32(a, b));

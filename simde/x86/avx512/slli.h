@@ -40,7 +40,7 @@ SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m512i
-simde_mm512_slli_epi16 (simde__m512i a, const int imm8)
+simde_mm512_slli_epi16 (simde__m512i a, const unsigned int imm8)
     SIMDE_REQUIRE_RANGE(imm8, 0, 255) {
   #if defined(SIMDE_X86_AVX512BW_NATIVE) && (defined(HEDLEY_GCC_VERSION) && ((__GNUC__ == 5 && __GNUC_MINOR__ == 5) || (__GNUC__ == 6 && __GNUC_MINOR__ >= 4)))
     simde__m512i r;

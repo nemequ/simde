@@ -211,6 +211,8 @@ simde_uint64x2_t
 simde_vcltq_s64(simde_int64x2_t a, simde_int64x2_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vcltq_s64(a, b);
+  #elif defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vreinterpretq_u64_s64(vshrq_n_s64(vqsubq_s64(a, b), 63));
   #elif defined(SIMDE_X86_SSE4_2_NATIVE)
     return _mm_cmpgt_epi64(b, a);
   #elif defined(SIMDE_POWER_ALTIVEC_P8_NATIVE)

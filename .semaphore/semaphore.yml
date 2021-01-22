@@ -1,0 +1,55 @@
+version: v1.0
+name: Build
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: CI
+    skip:
+      when: "branch = 'master' OR (branch !~ '^ci/semaphore(/.*)?' AND branch =~ '^ci/.+')"
+    task:
+      jobs:
+        - name: GCC
+          matrix:
+            - env_var: GCC_VERSION
+              values: ['8', '7', '6', '5']
+          commands:
+            - cat /proc/cpuinfo
+            - checkout
+            - git submodule update --init
+            - sudo apt-get update
+            - sudo apt-get install -y ninja-build python3-pip python3-setuptools gcovr gcc-${GCC_VERSION} g++-${GCC_VERSION}
+            - pip3 install meson
+            - mkdir build
+            - CC="gcc-${GCC_VERSION}" CXX="g++-${GCC_VERSION}" ~/.local/bin/meson setup build -Db_coverage=true --optimization $(expr $RANDOM % 3)
+            - ninja -C build -v
+            - './build/test/run-tests --list | grep -oP ''^/([^\/]+)/([^\/]+)'' | sort -u | xargs parallel ./build/test/run-tests --color always {} :::'
+            - ninja -C build coverage-xml
+          env_vars:
+            - name: CFLAGS
+              value: '-Wextra -Werror -march=native'
+            - name: CXXFLAGS
+              value: '-Wextra -Werror -march=native'
+
+        - name: clang
+          matrix:
+            - env_var: CLANG_VERSION
+              values: ['10', '8', '6.0', '4.0', '3.9']
+          commands:
+            - cat /proc/cpuinfo
+            - checkout
+            - git submodule update --init
+            - sudo apt-get update
+            - sudo apt-get install -y ninja-build python3-pip python3-setuptools gcovr clang-${CLANG_VERSION}
+            - pip3 install meson
+            - mkdir build
+            - CC="clang-${CLANG_VERSION}" CXX="clang++-${CLANG_VERSION}" ~/.local/bin/meson setup build -Db_coverage=true
+            - ninja -C build -v
+            - './build/test/run-tests --list | grep -oP ''^/([^\/]+)/([^\/]+)'' | sort -u | xargs parallel ./build/test/run-tests --color always {} :::'
+            - ninja -C build coverage-xml
+          env_vars:
+            - name: CFLAGS
+              value: -Weverything -Werror -march=native
+            - name: CXXFLAGS
+              value: -Weverything -Werror -march=native

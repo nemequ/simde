@@ -133,6 +133,15 @@
   #define SIMDE_X86_SSE4_2_NATIVE
 #endif
 
+#if !defined(SIMDE_X86_XOP_NATIVE) && !defined(SIMDE_X86_XOP_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
+  #if defined(SIMDE_ARCH_X86_XOP)
+    #define SIMDE_X86_XOP_NATIVE
+  #endif
+#endif
+#if defined(SIMDE_X86_XOP_NATIVE) && !defined(SIMDE_X86_SSE4_2_NATIVE)
+  #define SIMDE_X86_SSE4_2_NATIVE
+#endif
+
 #if !defined(SIMDE_X86_SSE4_2_NATIVE) && !defined(SIMDE_X86_SSE4_2_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
   #if defined(SIMDE_ARCH_X86_SSE4_2)
     #define SIMDE_X86_SSE4_2_NATIVE
@@ -236,6 +245,14 @@
   #include <xmmintrin.h>
 #elif defined(SIMDE_X86_MMX_NATIVE)
   #include <mmintrin.h>
+#endif
+
+#if defined(SIMDE_X86_XOP_NATIVE)
+  #if defined(_MSC_VER)
+    #include <intrin.h>
+  #else
+    #include <x86intrin.h>
+  #endif
 #endif
 
 #if defined(HEDLEY_MSVC_VERSION)

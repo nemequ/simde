@@ -4,6 +4,51 @@
 #include "../../../simde/arm/neon/abs.h"
 
 static int
+test_simde_vabsd_s64 (SIMDE_MUNIT_TEST_ARGS) {
+#if 1
+  static const struct {
+    int64_t a;
+    int64_t r;
+  } test_vec[] = {
+    {  INT64_C(  276336164582230812),
+       INT64_C(  276336164582230812) },
+    { -INT64_C( 7462378710667308762),
+       INT64_C( 7462378710667308762) },
+    { -INT64_C( 3808596764535413647),
+       INT64_C( 3808596764535413647) },
+    { -INT64_C( 1744909785833839419),
+       INT64_C( 1744909785833839419) },
+    {  INT64_C( 3578898303845682272),
+       INT64_C( 3578898303845682272) },
+    { -INT64_C( 6462880738838780002),
+       INT64_C( 6462880738838780002) },
+    {  INT64_C( 7176398727321188705),
+       INT64_C( 7176398727321188705) },
+    {  INT64_C( 1281167105828772884),
+       INT64_C( 1281167105828772884) }
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])) ; i++) {
+    int64_t r = simde_vabsd_s64(test_vec[i].a);
+
+    simde_assert_equal_i64(r, test_vec[i].r);
+  }
+
+  return 0;
+#else
+  fputc('\n', stdout);
+  for (int i = 0 ; i < 8 ; i++) {
+    int64_t a = simde_test_codegen_random_i64();
+    int64_t r = simde_vabsd_s64(a);
+
+    simde_test_codegen_write_i64(2, a, SIMDE_TEST_VEC_POS_FIRST);
+    simde_test_codegen_write_i64(2, r, SIMDE_TEST_VEC_POS_LAST);
+  }
+  return 1;
+#endif
+}
+
+static int
 test_simde_vabs_f32 (SIMDE_MUNIT_TEST_ARGS) {
   static const struct {
     simde_float32 a[2];
@@ -425,6 +470,8 @@ test_simde_vabsq_s64 (SIMDE_MUNIT_TEST_ARGS) {
 }
 
 SIMDE_TEST_FUNC_LIST_BEGIN
+SIMDE_TEST_FUNC_LIST_ENTRY(vabsd_s64)
+
 SIMDE_TEST_FUNC_LIST_ENTRY(vabs_f32)
 SIMDE_TEST_FUNC_LIST_ENTRY(vabs_f64)
 SIMDE_TEST_FUNC_LIST_ENTRY(vabs_s8)

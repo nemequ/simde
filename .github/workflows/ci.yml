@@ -3,8 +3,9 @@ name: CI
 on:
   push:
     branches-ignore:
-      - master
-  pull_request:
+      - 'master'
+      - 'ci/**'
+      - '!ci/gha**'
 
 jobs:
   formatting:
@@ -52,6 +53,81 @@ jobs:
     # Check indentation of preprocessor directives.
     - name: Preprocessor directive indentation
       run: find simde/*/ -name 'avx*.h' -exec pcre2grep -M '{\n#' {} + && exit 1 || exit 0
+
+  # Running the tests in SDE is pretty slow, so we put these early
+  # in the file so hopefully they start sooner.
+
+  SDE:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["icelake-server"]
+    env:
+      CC: clang
+      CXX: clang++
+      CFLAGS: -march=icelake-server -Wall -Wextra -Werror
+      CXXFLAGS: -march=icelake-server -Wall -Wextra -Werror
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: CPU Information
+      run: cat /proc/cpuinfo
+    - name: Install APT Dependencies
+      run: sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' && sudo apt-get update && sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel parallel gcovr
+    - name: Install pip Dependencies
+      run: pip3 install meson
+    - name: Download SDE
+      run: ./test/download-sde.sh ~/sde
+    - name: Configure
+      run: ~/.local/bin/meson setup build -Db_coverage=true
+    - name: Build
+      run: ninja -C build -v
+    - name: Test
+      run: |
+        find build/test/ -type f -executable -exec parallel ~/sde/sde64 -- ::: {} \;
+    - name: Coverage Report
+      run: ninja -C build -v coverage-xml
+    - name: CodeCov.io
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./build/meson-logs/coverage.xml
+
+  sleef-SDE:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        arch: ["icelake-server"]
+    env:
+      CC: clang
+      CXX: clang++
+      CFLAGS: -march=icelake-server -Wall -Wextra -Werror
+      CXXFLAGS: -march=icelake-server -Wall -Wextra -Werror
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: CPU Information
+      run: cat /proc/cpuinfo
+    - name: Install APT Dependencies
+      run: sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' && sudo apt-get update && sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel parallel gcovr libsleef-dev
+    - name: Install pip Dependencies
+      run: pip3 install meson
+    - name: Download SDE
+      run: ./test/download-sde.sh ~/sde
+    - name: Configure
+      run: ~/.local/bin/meson setup build -Dsleef=enabled -Db_coverage=true
+    - name: Build
+      run: ninja -C build -v
+    - name: Test
+      run: |
+        find build/test/ -type f -executable -exec parallel ~/sde/sde64 -- ::: {} \;
+    - name: Coverage Report
+      run: ninja -C build -v coverage-xml
+    - name: CodeCov.io
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./build/meson-logs/coverage.xml
 
   x86:
     runs-on: ubuntu-latest
@@ -117,72 +193,6 @@ jobs:
     #   with:
     #     file: ./build/meson-logs/coverage.xml
 
-  gcc:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version: ["10", "8"]
-    env:
-      CC: gcc-${{ matrix.version }}
-      CXX: g++-${{ matrix.version }}
-      CFLAGS: -Wall -Wextra -Werror -march=native
-      CXXFLAGS: -Wall -Wextra -Werror -march=native
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: CPU Information
-      run: cat /proc/cpuinfo
-    - name: Install APT Dependencies
-      run: sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' && sudo apt-get update && sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel parallel gcovr gcc-${{ matrix.version }} g++-${{ matrix.version }}
-    - name: Install pip Dependencies
-      run: pip3 install meson
-    - name: Configure
-      run: ~/.local/bin/meson setup build -Db_coverage=true
-    - name: Build
-      run: ninja -C build -v
-    - name: Test
-      run: ninja -C build -v test
-    - name: Coverage Report
-      run: ninja -C build -v coverage-xml
-    - name: CodeCov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./build/meson-logs/coverage.xml
-
-  clang:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        version: ["10", "8"]
-    env:
-      CC: clang-${{ matrix.version }}
-      CXX: clang++-${{ matrix.version }}
-      CFLAGS: -Wall -Weverything -Werror -march=native
-      CXXFLAGS: -Wall -Weverything -Werror -march=native
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: CPU Information
-      run: cat /proc/cpuinfo
-    - name: Install APT Dependencies
-      run: sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' && sudo apt-get update && sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel parallel gcovr clang-${{ matrix.version }}
-    - name: Install pip Dependencies
-      run: pip3 install meson
-    - name: Configure
-      run: ~/.local/bin/meson setup build -Db_coverage=true
-    - name: Build
-      run: ninja -C build -v
-    - name: Test
-      run: ninja -C build -v test
-    - name: Coverage Report
-      run: ninja -C build -v coverage-xml
-    - name: CodeCov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./build/meson-logs/coverage.xml
-
   emscripten:
     runs-on: ubuntu-latest
     env:
@@ -212,42 +222,6 @@ jobs:
       run: ninja -C test/build -v
     - name: Test
       run: cd test/build && ~/.jsvu/v8 --experimental-wasm-simd run-tests.js
-
-  SDE:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: ["icelake-server"]
-    env:
-      CC: clang
-      CXX: clang++
-      CFLAGS: -march=icelake-server -Wall -Wextra -Werror
-      CXXFLAGS: -march=icelake-server -Wall -Wextra -Werror
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: CPU Information
-      run: cat /proc/cpuinfo
-    - name: Install APT Dependencies
-      run: sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' && sudo apt-get update && sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel parallel gcovr
-    - name: Install pip Dependencies
-      run: pip3 install meson
-    - name: Download SDE
-      run: ./test/download-sde.sh ~/sde
-    - name: Configure
-      run: ~/.local/bin/meson setup build -Db_coverage=true
-    - name: Build
-      run: ninja -C build -v
-    - name: Test
-      run: |
-        find build/test/ -type f -executable -exec parallel ~/sde/sde64 -- ::: {} \;
-    - name: Coverage Report
-      run: ninja -C build -v coverage-xml
-    - name: CodeCov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./build/meson-logs/coverage.xml
 
   native-aliases:
     runs-on: ubuntu-latest
@@ -302,42 +276,6 @@ jobs:
       run: ninja -C build -v
     - name: Test
       run: ninja -C build -v test
-    - name: Coverage Report
-      run: ninja -C build -v coverage-xml
-    - name: CodeCov.io
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./build/meson-logs/coverage.xml
-
-  sleef-SDE:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        arch: ["icelake-server"]
-    env:
-      CC: clang
-      CXX: clang++
-      CFLAGS: -march=icelake-server -Wall -Wextra -Werror
-      CXXFLAGS: -march=icelake-server -Wall -Wextra -Werror
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: CPU Information
-      run: cat /proc/cpuinfo
-    - name: Install APT Dependencies
-      run: sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' && sudo apt-get update && sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel parallel gcovr libsleef-dev
-    - name: Install pip Dependencies
-      run: pip3 install meson
-    - name: Download SDE
-      run: ./test/download-sde.sh ~/sde
-    - name: Configure
-      run: ~/.local/bin/meson setup build -Dsleef=enabled -Db_coverage=true
-    - name: Build
-      run: ninja -C build -v
-    - name: Test
-      run: |
-        find build/test/ -type f -executable -exec parallel ~/sde/sde64 -- ::: {} \;
     - name: Coverage Report
       run: ninja -C build -v coverage-xml
     - name: CodeCov.io
@@ -401,7 +339,7 @@ jobs:
       matrix:
         # https://www.jessesquires.com/blog/2020/01/06/selecting-an-xcode-version-on-github-ci/
         # https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xcode
-        xcode: ["11.4", "11.6_beta", "12_beta"]
+        xcode: ["11.3.1", "11.7", "12.3"]
     env:
       DEVELOPER_DIR:  /Applications/Xcode_${{ matrix.xcode }}.app
     steps:
@@ -424,3 +362,36 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: ./build/meson-logs/coverage.xml
+
+  icc:
+    runs-on: ubuntu-latest
+    env:
+      CC: /home/runner/.local/bin/icc
+      CXX: /home/runner/.local/bin/icpc
+      CFLAGS: -Werror -wd13200 -wd13203 -wd16219 -Wall -Werror -march=native
+      CXXFLAGS: -wd13200 -wd13203 -wd16219 -Wall -Werror -march=native
+    steps:
+    - uses: actions/checkout@v2
+    - name: CPU Information
+      run: cat /proc/cpuinfo
+    - name: Install APT Dependencies
+      run: sudo apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel
+    - name: Install ICC
+      run: |
+        curl -s https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB | sudo apt-key add -
+        sudo add-apt-repository 'deb https://apt.repos.intel.com/oneapi all main'
+        sudo apt-get update
+        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic ninja-build ninja-build python3-pip python3-setuptools python3-wheel
+        mkdir -p ~/.local/bin/ || true
+        for exe in icc icpc; do
+          printf '#!/bin/bash\nARGS="$@"\nsource /opt/intel/oneapi/compiler/latest/env/vars.sh >/dev/null\n%s ${ARGS}\n' "${exe}" > ~/.local/bin/"${exe}"
+          chmod 0755 ~/.local/bin/"${exe}";
+        done
+    - name: Install pip Dependencies
+      run: pip3 install meson
+    - name: Configure
+      run: ~/.local/bin/meson setup build
+    - name: Build
+      run: ninja -C build -v
+    - name: Test
+      run: ninja -C build -v test

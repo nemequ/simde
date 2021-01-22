@@ -1,7 +1,7 @@
 project('SIMDe', 'c', 'cpp',
         default_options: ['c_std=c99'],
         license: 'MIT',
-        version: '0.7.0-rc.1')
+        version: '0.7.1')
 
 cc = meson.get_compiler('c')
 cxx = meson.get_compiler('cpp')
@@ -107,6 +107,10 @@ simde_neon_families = [
   'rev64',
   'rhadd',
   'rnd',
+  'rndi',
+  'rndm',
+  'rndn',
+  'rndp',
   'rshl',
   'rshr_n',
   'rsra_n',
@@ -244,6 +248,7 @@ if not meson.is_subproject()
       'simde/simde-diagnostic.h',
       'simde/simde-features.h',
       'simde/simde-math.h',
+      'simde/simde-complex.h',
       ]),
     subdir: 'simde')
 
@@ -262,6 +267,7 @@ if not meson.is_subproject()
       'simde/x86/sse.h',
       'simde/x86/ssse3.h',
       'simde/x86/svml.h',
+      'simde/x86/xop.h',
       ]),
     subdir: 'simde/x86')
 

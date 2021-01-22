@@ -38,6 +38,36 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde_float32_t
+simde_vabds_f32(simde_float32_t a, simde_float32_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vabds_f32(a, b);
+  #else
+    simde_float32_t r = a - b;
+    return r < 0 ? -r : r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vabds_f32
+  #define vabds_f32(a, b) simde_vabds_f32((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float64_t
+simde_vabdd_f64(simde_float64_t a, simde_float64_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vabdd_f64(a, b);
+  #else
+    simde_float64_t r = a - b;
+    return r < 0 ? -r : r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vabdd_f64
+  #define vabdd_f64(a, b) simde_vabdd_f64((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x2_t
 simde_vabd_f32(simde_float32x2_t a, simde_float32x2_t b) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)

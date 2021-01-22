@@ -29,9 +29,13 @@
 #define SIMDE_ARM_NEON_LD3_H
 
 #include "types.h"
+#include "ld1.h"
 
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
+#if defined(HEDLEY_GCC_VERSION)
+  SIMDE_DIAGNOSTIC_DISABLE_MAYBE_UNINITIAZILED_
+#endif
 SIMDE_BEGIN_DECLS_
 
 #if !defined(SIMDE_BUG_INTEL_857088)
@@ -42,12 +46,21 @@ simde_vld3_f32(simde_float32 const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_f32(ptr);
   #else
-    simde_float32x2_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_float32x2_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_float32x2_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_float32x2x3_t s_ = { { simde_float32x2_from_private(a_[0]), simde_float32x2_from_private(a_[1]), simde_float32x2_from_private(a_[2]) } };
-    return (s_);
+
+    simde_float32x2x3_t r = { {
+      simde_float32x2_from_private(r_[0]),
+      simde_float32x2_from_private(r_[1]),
+      simde_float32x2_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -61,12 +74,21 @@ simde_vld3_f64(simde_float64 const *ptr) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vld3_f64(ptr);
   #else
-    simde_float64x1_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_float64x1_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_float64x1_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_float64x1x3_t s_ = { { simde_float64x1_from_private(a_[0]), simde_float64x1_from_private(a_[1]), simde_float64x1_from_private(a_[2]) } };
-    return s_;
+
+    simde_float64x1x3_t r = { {
+      simde_float64x1_from_private(r_[0]),
+      simde_float64x1_from_private(r_[1]),
+      simde_float64x1_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
@@ -80,12 +102,21 @@ simde_vld3_s8(int8_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_s8(ptr);
   #else
-    simde_int8x8_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int8x8_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int8x8_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int8x8x3_t s_ = { { simde_int8x8_from_private(a_[0]), simde_int8x8_from_private(a_[1]), simde_int8x8_from_private(a_[2]) } };
-    return s_;
+
+    simde_int8x8x3_t r = { {
+      simde_int8x8_from_private(r_[0]),
+      simde_int8x8_from_private(r_[1]),
+      simde_int8x8_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -99,12 +130,21 @@ simde_vld3_s16(int16_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_s16(ptr);
   #else
-    simde_int16x4_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int16x4_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int16x4_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int16x4x3_t s_ = { { simde_int16x4_from_private(a_[0]), simde_int16x4_from_private(a_[1]), simde_int16x4_from_private(a_[2]) } };
-    return s_;
+
+    simde_int16x4x3_t r = { {
+      simde_int16x4_from_private(r_[0]),
+      simde_int16x4_from_private(r_[1]),
+      simde_int16x4_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -118,12 +158,21 @@ simde_vld3_s32(int32_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_s32(ptr);
   #else
-    simde_int32x2_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int32x2_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int32x2_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int32x2x3_t s_ = { { simde_int32x2_from_private(a_[0]), simde_int32x2_from_private(a_[1]), simde_int32x2_from_private(a_[2]) } };
-    return s_;
+
+    simde_int32x2x3_t r = { {
+      simde_int32x2_from_private(r_[0]),
+      simde_int32x2_from_private(r_[1]),
+      simde_int32x2_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -137,12 +186,21 @@ simde_vld3_s64(int64_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_s64(ptr);
   #else
-    simde_int64x1_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int64x1_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int64x1_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int64x1x3_t s_ = { { simde_int64x1_from_private(a_[0]), simde_int64x1_from_private(a_[1]), simde_int64x1_from_private(a_[2]) } };
-    return s_;
+
+    simde_int64x1x3_t r = { {
+      simde_int64x1_from_private(r_[0]),
+      simde_int64x1_from_private(r_[1]),
+      simde_int64x1_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
@@ -156,12 +214,21 @@ simde_vld3_u8(uint8_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_u8(ptr);
   #else
-    simde_uint8x8_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint8x8_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint8x8_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint8x8x3_t s_ = { { simde_uint8x8_from_private(a_[0]), simde_uint8x8_from_private(a_[1]), simde_uint8x8_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint8x8x3_t r = { {
+      simde_uint8x8_from_private(r_[0]),
+      simde_uint8x8_from_private(r_[1]),
+      simde_uint8x8_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -175,12 +242,21 @@ simde_vld3_u16(uint16_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_u16(ptr);
   #else
-    simde_uint16x4_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint16x4_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint16x4_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint16x4x3_t s_ = { { simde_uint16x4_from_private(a_[0]), simde_uint16x4_from_private(a_[1]), simde_uint16x4_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint16x4x3_t r = { {
+      simde_uint16x4_from_private(r_[0]),
+      simde_uint16x4_from_private(r_[1]),
+      simde_uint16x4_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -194,12 +270,21 @@ simde_vld3_u32(uint32_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_u32(ptr);
   #else
-    simde_uint32x2_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint32x2_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint32x2_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint32x2x3_t s_ = { { simde_uint32x2_from_private(a_[0]), simde_uint32x2_from_private(a_[1]), simde_uint32x2_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint32x2x3_t r = { {
+      simde_uint32x2_from_private(r_[0]),
+      simde_uint32x2_from_private(r_[1]),
+      simde_uint32x2_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -213,12 +298,21 @@ simde_vld3_u64(uint64_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3_u64(ptr);
   #else
-    simde_uint64x1_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint64x1_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint64x1_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint64x1x3_t s_ = { { simde_uint64x1_from_private(a_[0]), simde_uint64x1_from_private(a_[1]), simde_uint64x1_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint64x1x3_t r = { {
+      simde_uint64x1_from_private(r_[0]),
+      simde_uint64x1_from_private(r_[1]),
+      simde_uint64x1_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
@@ -232,12 +326,21 @@ simde_vld3q_f32(simde_float32 const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_f32(ptr);
   #else
-    simde_float32x4_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_float32x4_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_float32x4_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_float32x4x3_t s_ = { { simde_float32x4_from_private(a_[0]), simde_float32x4_from_private(a_[1]), simde_float32x4_from_private(a_[2]) } };
-    return s_;
+
+    simde_float32x4x3_t r = { {
+      simde_float32x4_from_private(r_[0]),
+      simde_float32x4_from_private(r_[1]),
+      simde_float32x4_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -251,12 +354,21 @@ simde_vld3q_f64(simde_float64 const *ptr) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vld3q_f64(ptr);
   #else
-    simde_float64x2_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_float64x2_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_float64x2_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_float64x2x3_t s_ = { { simde_float64x2_from_private(a_[0]), simde_float64x2_from_private(a_[1]), simde_float64x2_from_private(a_[2]) } };
-    return s_;
+
+    simde_float64x2x3_t r = { {
+      simde_float64x2_from_private(r_[0]),
+      simde_float64x2_from_private(r_[1]),
+      simde_float64x2_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
@@ -270,12 +382,21 @@ simde_vld3q_s8(int8_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_s8(ptr);
   #else
-    simde_int8x16_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int8x16_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int8x16_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int8x16x3_t s_ = { { simde_int8x16_from_private(a_[0]), simde_int8x16_from_private(a_[1]), simde_int8x16_from_private(a_[2]) } };
-    return s_;
+
+    simde_int8x16x3_t r = { {
+      simde_int8x16_from_private(r_[0]),
+      simde_int8x16_from_private(r_[1]),
+      simde_int8x16_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -289,12 +410,21 @@ simde_vld3q_s16(int16_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_s16(ptr);
   #else
-    simde_int16x8_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int16x8_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int16x8_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int16x8x3_t s_ = { { simde_int16x8_from_private(a_[0]), simde_int16x8_from_private(a_[1]), simde_int16x8_from_private(a_[2]) } };
-    return s_;
+
+    simde_int16x8x3_t r = { {
+      simde_int16x8_from_private(r_[0]),
+      simde_int16x8_from_private(r_[1]),
+      simde_int16x8_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -308,12 +438,21 @@ simde_vld3q_s32(int32_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_s32(ptr);
   #else
-    simde_int32x4_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int32x4_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int32x4_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int32x4x3_t s_ = { { simde_int32x4_from_private(a_[0]), simde_int32x4_from_private(a_[1]), simde_int32x4_from_private(a_[2]) } };
-    return s_;
+
+    simde_int32x4x3_t r = { {
+      simde_int32x4_from_private(r_[0]),
+      simde_int32x4_from_private(r_[1]),
+      simde_int32x4_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -327,12 +466,21 @@ simde_vld3q_s64(int64_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vld3q_s64(ptr);
   #else
-    simde_int64x2_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_int64x2_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_int64x2_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_int64x2x3_t s_ = { { simde_int64x2_from_private(a_[0]), simde_int64x2_from_private(a_[1]), simde_int64x2_from_private(a_[2]) } };
-    return s_;
+
+    simde_int64x2x3_t r = { {
+      simde_int64x2_from_private(r_[0]),
+      simde_int64x2_from_private(r_[1]),
+      simde_int64x2_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
@@ -347,12 +495,21 @@ simde_vld3q_u8(uint8_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_u8(ptr);
   #else
-    simde_uint8x16_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint8x16_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint8x16_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint8x16x3_t s_ = { { simde_uint8x16_from_private(a_[0]), simde_uint8x16_from_private(a_[1]), simde_uint8x16_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint8x16x3_t r = { {
+      simde_uint8x16_from_private(r_[0]),
+      simde_uint8x16_from_private(r_[1]),
+      simde_uint8x16_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -366,12 +523,21 @@ simde_vld3q_u16(uint16_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_u16(ptr);
   #else
-    simde_uint16x8_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint16x8_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint16x8_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint16x8x3_t s_ = { { simde_uint16x8_from_private(a_[0]), simde_uint16x8_from_private(a_[1]), simde_uint16x8_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint16x8x3_t r = { {
+      simde_uint16x8_from_private(r_[0]),
+      simde_uint16x8_from_private(r_[1]),
+      simde_uint16x8_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -385,12 +551,21 @@ simde_vld3q_u32(uint32_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vld3q_u32(ptr);
   #else
-    simde_uint32x4_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint32x4_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint32x4_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint32x4x3_t s_ = { { simde_uint32x4_from_private(a_[0]), simde_uint32x4_from_private(a_[1]), simde_uint32x4_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint32x4x3_t r = { {
+      simde_uint32x4_from_private(r_[0]),
+      simde_uint32x4_from_private(r_[1]),
+      simde_uint32x4_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
@@ -404,12 +579,21 @@ simde_vld3q_u64(uint64_t const *ptr) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vld3q_u64(ptr);
   #else
-    simde_uint64x2_private a_[3];
-    for (size_t i = 0; i < (sizeof(simde_uint64x2_t) / sizeof(*ptr)) * 3 ; i++) {
-      a_[i % 3].values[i / 3] = ptr[i];
+    simde_uint64x2_private r_[3];
+
+    for (size_t i = 0; i < (sizeof(r_) / sizeof(r_[0])); i++) {
+      for (size_t j = 0 ; j < (sizeof(r_[0].values) / sizeof(r_[0].values[0])) ; j++) {
+        r_[i].values[j] = ptr[i + (j * (sizeof(r_) / sizeof(r_[0])))];
+      }
     }
-    simde_uint64x2x3_t s_ = { { simde_uint64x2_from_private(a_[0]), simde_uint64x2_from_private(a_[1]), simde_uint64x2_from_private(a_[2]) } };
-    return s_;
+
+    simde_uint64x2x3_t r = { {
+      simde_uint64x2_from_private(r_[0]),
+      simde_uint64x2_from_private(r_[1]),
+      simde_uint64x2_from_private(r_[2])
+    } };
+
+    return r;
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)

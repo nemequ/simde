@@ -1,0 +1,115 @@
+version: 2.1
+jobs:
+  gcc:
+    docker:
+      - image: debian:testing-slim
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment:
+      CFLAGS: -Wextra -Werror -march=native
+      CXXFLAGS: -Wextra -Werror -march=native
+    steps:
+      - checkout
+      - run: cat /proc/cpuinfo /proc/meminfo
+      - run: apt-get update && apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel gcovr
+      - run: apt-get install -y gcc g++
+      - run: pip3 install meson
+      - run: CC=gcc CXX=g++ /usr/local/bin/meson setup build -Db_coverage=true
+      - run: ninja -C build -v -j 3
+      - run: ninja -C build -v test
+
+  clang:
+    docker:
+      - image: debian:testing-slim
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment:
+      CFLAGS: -Weverything -Werror -march=native
+      CXXFLAGS: -Weverything -Werror -march=native
+    steps:
+      - checkout
+      - run: cat /proc/cpuinfo /proc/meminfo
+      - run: apt-get update && apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel gcovr
+      - run: apt-get install -y clang
+      - run: pip3 install meson
+      - run: CC=clang CXX=clang++ /usr/local/bin/meson setup build -Db_coverage=true
+      - run: ninja -C build -v -j 3
+      - run: ninja -C build -v test
+
+  loongson:
+    docker:
+      - image: debian:testing-slim
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment:
+      CC: mips64el-linux-gnuabi64-gcc
+      CXX: mips64el-linux-gnuabi64-g++
+      CFLAGS: -Wextra -Werror
+      CXXFLAGS: -Wextra -Werror
+    steps:
+      - checkout
+      - run: cat /proc/cpuinfo /proc/meminfo
+      - run: dpkg --add-architecture mips64el
+      - run: apt-get update && apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel gcovr
+      - run: apt-get install -y gcc-mips64el-linux-gnuabi64 g++-mips64el-linux-gnuabi64 qemu-user-static libc6-dev:mips64el libstdc++6:mips64el
+      - run: pip3 install meson
+      - run: /usr/local/bin/meson setup build -Db_coverage=true --cross-file=docker/cross-files/loongson-gcc.cross
+      - run: ninja -C build -v -j 3
+      # - run: ninja -C build -v -j 3 test
+
+  i686:
+    docker:
+      - image: debian:testing-slim
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment:
+      CFLAGS: -Wextra -Werror -march=native
+      CXXFLAGS: -Wextra -Werror -march=native
+    steps:
+      - checkout
+      - run:
+          name: System Information
+          command: cat /proc/cpuinfo /proc/meminfo
+      - run:
+          name: Install architecture
+          command: |
+            dpkg --add-architecture i386
+      - run: apt-get update && apt-get install -y ninja-build ninja-build python3-pip python3-setuptools python3-wheel gcovr
+      - run: apt-get install -y {gcc,g++}-i686-linux-gnu libc6-dev:i386
+      - run: pip3 install meson
+      - run: CC=x86_64-linux-gnu-gcc CXX=x86_64-linux-gnu-g++ /usr/local/bin/meson setup build -Db_coverage=true
+      - run: ninja -C build -v -j 3
+      - run: ninja -C build -v test
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - gcc:
+          filters:
+            branches:
+              ignore:
+              - master
+              - /^ci/(?!circleci).*$/
+      - clang:
+          filters:
+            branches:
+              ignore:
+              - master
+              - /^ci/(?!circleci).*$/
+      - loongson:
+          filters:
+            branches:
+              ignore:
+              - master
+              - /^ci/(?!circleci).*$/
+      - i686:
+          filters:
+            branches:
+              ignore:
+              - master
+              - /^ci/(?!circleci).*$/

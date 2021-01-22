@@ -67,7 +67,7 @@ simde_vdot_s32(simde_int32x2_t r, simde_int8x8_t a, simde_int8x8_t b) {
     return simde_vadd_s32(r, simde_int32x2_from_private(r_));
   #endif
 }
-#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES) || (defined(SIMDE_ENABLE_NATIVE_ALIASES) && !defined(__ARM_FEATURE_DOTPROD))
   #undef vdot_s32
   #define vdot_s32(r, a, b) simde_vdot_s32((r), (a), (b))
 #endif
@@ -97,7 +97,7 @@ simde_vdot_u32(simde_uint32x2_t r, simde_uint8x8_t a, simde_uint8x8_t b) {
     return simde_vadd_u32(r, simde_uint32x2_from_private(r_));
   #endif
 }
-#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES) || (defined(SIMDE_ENABLE_NATIVE_ALIASES) && !defined(__ARM_FEATURE_DOTPROD))
   #undef vdot_u32
   #define vdot_u32(r, a, b) simde_vdot_u32((r), (a), (b))
 #endif
@@ -128,7 +128,7 @@ simde_vdotq_s32(simde_int32x4_t r, simde_int8x16_t a, simde_int8x16_t b) {
     return simde_vaddq_s32(r, simde_int32x4_from_private(r_));
   #endif
 }
-#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES) || (defined(SIMDE_ENABLE_NATIVE_ALIASES) && !defined(__ARM_FEATURE_DOTPROD))
   #undef vdotq_s32
   #define vdotq_s32(r, a, b) simde_vdotq_s32((r), (a), (b))
 #endif
@@ -159,7 +159,7 @@ simde_vdotq_u32(simde_uint32x4_t r, simde_uint8x16_t a, simde_uint8x16_t b) {
     return simde_vaddq_u32(r, simde_uint32x4_from_private(r_));
   #endif
 }
-#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES) || (defined(SIMDE_ENABLE_NATIVE_ALIASES) && !defined(__ARM_FEATURE_DOTPROD))
   #undef vdotq_u32
   #define vdotq_u32(r, a, b) simde_vdotq_u32((r), (a), (b))
 #endif

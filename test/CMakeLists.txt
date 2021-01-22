@@ -101,20 +101,12 @@ aux_source_directory("x86/avx512" X86_AVX512_SOURCES_C)
 list(REMOVE_ITEM X86_AVX512_SOURCES_C "x86/avx512/run-tests.c")
 list(REMOVE_ITEM X86_AVX512_SOURCES_C "x86/avx512/skel.c")
 
+aux_source_directory("x86" X86_SOURCES_C)
+list(REMOVE_ITEM X86_SOURCES_C "x86/skel.c")
+list(REMOVE_ITEM X86_SOURCES_C "x86/run-tests.c")
+
 set(TEST_SOURCES_C
-  x86/mmx.c
-  x86/sse.c
-  x86/sse2.c
-  x86/sse3.c
-  x86/ssse3.c
-  x86/sse4.1.c
-  x86/sse4.2.c
-  x86/avx.c
-  x86/avx2.c
-  x86/gfni.c
-  x86/clmul.c
-  x86/fma.c
-  x86/svml.c
+  ${X86_SOURCES_C}
   ${X86_AVX512_SOURCES_C}
   ${ARM_NEON_SOURCES_C})
 

@@ -151,8 +151,8 @@
  *
  * Most compilers are okay with types which are aligned beyond what
  * they think is the maximum, as long as the alignment is a power
- * of two.  MSVC is the exception (of course), so we need to cap the
- * alignment requests at values that the implementation supports.
+ * of two.  Older versions of MSVC is the exception, so we need to cap
+ * the alignment requests at values that the implementation supports.
  *
  * XL C/C++ will accept values larger than 16 (which is the alignment
  * of an AltiVec vector), but will not reliably align to the larger
@@ -163,18 +163,22 @@
  * macro will just return the value passed to it. */
 #if !defined(SIMDE_ALIGN_MAXIMUM)
   #if defined(HEDLEY_MSVC_VERSION)
-    #if defined(_M_IX86) || defined(_M_AMD64)
-      #if HEDLEY_MSVC_VERSION_CHECK(19,14,0)
-        #define SIMDE_ALIGN_PLATFORM_MAXIMUM 64
-      #elif HEDLEY_MSVC_VERSION_CHECK(16,0,0)
-        /* VS 2010 is really a guess based on Wikipedia; if anyone can
-         * test with old VS versions I'd really appreciate it. */
-        #define SIMDE_ALIGN_PLATFORM_MAXIMUM 32
-      #else
-        #define SIMDE_ALIGN_PLATFORM_MAXIMUM 16
+    #if HEDLEY_MSVC_VERSION_CHECK(19, 16, 0)
+      // Visual studio 2017 and newer does not need a max
+    #else
+      #if defined(_M_IX86) || defined(_M_AMD64)
+        #if HEDLEY_MSVC_VERSION_CHECK(19,14,0)
+          #define SIMDE_ALIGN_PLATFORM_MAXIMUM 64
+        #elif HEDLEY_MSVC_VERSION_CHECK(16,0,0)
+          /* VS 2010 is really a guess based on Wikipedia; if anyone can
+           * test with old VS versions I'd really appreciate it. */
+          #define SIMDE_ALIGN_PLATFORM_MAXIMUM 32
+        #else
+          #define SIMDE_ALIGN_PLATFORM_MAXIMUM 16
+        #endif
+      #elif defined(_M_ARM) || defined(_M_ARM64)
+        #define SIMDE_ALIGN_PLATFORM_MAXIMUM 8
       #endif
-    #elif defined(_M_ARM) || defined(_M_ARM64)
-      #define SIMDE_ALIGN_PLATFORM_MAXIMUM 8
     #endif
   #elif defined(HEDLEY_IBM_VERSION)
     #define SIMDE_ALIGN_PLATFORM_MAXIMUM 16

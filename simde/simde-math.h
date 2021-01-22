@@ -30,6 +30,7 @@
  * libm, we may need to define our own implementations. */
 
 #if !defined(SIMDE_MATH_H)
+#define SIMDE_MATH_H 1
 
 #include "hedley.h"
 #include "simde-features.h"
@@ -128,92 +129,6 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
   #else
     #define SIMDE_MATH_HAVE_MATH_H
     #include <math.h>
-  #endif
-#endif
-
-/* Try to avoid including <complex> since it pulls in a *lot* of code. */
-#if \
-    HEDLEY_HAS_BUILTIN(__builtin_creal) || \
-    HEDLEY_GCC_VERSION_CHECK(4,7,0) || \
-    HEDLEY_INTEL_VERSION_CHECK(13,0,0)
-  HEDLEY_DIAGNOSTIC_PUSH
-  SIMDE_DIAGNOSTIC_DISABLE_C99_EXTENSIONS_
-    typedef __complex__ float simde_cfloat32;
-    typedef __complex__ double simde_cfloat64;
-  HEDLEY_DIAGNOSTIC_POP
-  #define SIMDE_MATH_CMPLX(x, y) (HEDLEY_STATIC_CAST(double, x) + HEDLEY_STATIC_CAST(double, y) * (__extension__ 1.0j))
-  #define SIMDE_MATH_CMPLXF(x, y) (HEDLEY_STATIC_CAST(float, x) + HEDLEY_STATIC_CAST(float, y) * (__extension__ 1.0fj))
-
-  #if !defined(simde_math_creal)
-    #define simde_math_crealf(z) __builtin_crealf(z)
-  #endif
-  #if !defined(simde_math_crealf)
-    #define simde_math_creal(z) __builtin_creal(z)
-  #endif
-  #if !defined(simde_math_cimag)
-    #define simde_math_cimagf(z) __builtin_cimagf(z)
-  #endif
-  #if !defined(simde_math_cimagf)
-    #define simde_math_cimag(z) __builtin_cimag(z)
-  #endif
-#elif !defined(__cplusplus)
-  #include <complex.h>
-
-  #if !defined(HEDLEY_MSVC_VERSION)
-    typedef float _Complex simde_cfloat32;
-    typedef double _Complex simde_cfloat64;
-  #else
-    typedef _Fcomplex simde_cfloat32;
-    typedef _Dcomplex simde_cfloat64;
-  #endif
-
-  #if defined(HEDLEY_MSVC_VERSION)
-    #define SIMDE_MATH_CMPLX(x, y) ((simde_cfloat64) { (x), (y) })
-    #define SIMDE_MATH_CMPLXF(x, y) ((simde_cfloat32) { (x), (y) })
-  #elif defined(CMPLX) && defined(CMPLXF)
-    #define SIMDE_MATH_CMPLX(x, y) CMPLX(x, y)
-    #define SIMDE_MATH_CMPLXF(x, y) CMPLXF(x, y)
-  #else
-    #define SIMDE_MATH_CMPLX(x, y) (HEDLEY_STATIC_CAST(double, x) + HEDLEY_STATIC_CAST(double, y) * I)
-    #define SIMDE_MATH_CMPLXF(x, y) (HEDLEY_STATIC_CAST(float, x) + HEDLEY_STATIC_CAST(float, y) * I)
-  #endif
-
-  #if !defined(simde_math_creal)
-    #define simde_math_creal(z) creal(z)
-  #endif
-  #if !defined(simde_math_crealf)
-    #define simde_math_crealf(z) crealf(z)
-  #endif
-  #if !defined(simde_math_cimag)
-    #define simde_math_cimag(z) cimag(z)
-  #endif
-  #if !defined(simde_math_cimagf)
-    #define simde_math_cimagf(z) cimagf(z)
-  #endif
-#else
-  HEDLEY_DIAGNOSTIC_PUSH
-  #if defined(HEDLEY_MSVC_VERSION)
-    #pragma warning(disable:4530)
-  #endif
-  #include <complex>
-  HEDLEY_DIAGNOSTIC_POP
-
-  typedef std::complex<float> simde_cfloat32;
-  typedef std::complex<double> simde_cfloat64;
-  #define SIMDE_MATH_CMPLX(x, y) (std::complex<double>(x, y))
-  #define SIMDE_MATH_CMPLXF(x, y) (std::complex<float>(x, y))
-
-  #if !defined(simde_math_creal)
-    #define simde_math_creal(z) ((z).real())
-  #endif
-  #if !defined(simde_math_crealf)
-    #define simde_math_crealf(z) ((z).real())
-  #endif
-  #if !defined(simde_math_cimag)
-    #define simde_math_cimag(z) ((z).imag())
-  #endif
-  #if !defined(simde_math_cimagf)
-    #define simde_math_cimagf(z) ((z).imag())
   #endif
 #endif
 
@@ -1017,6 +932,26 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
   #endif
 #endif
 
+#if !defined(simde_math_modf)
+  #if SIMDE_MATH_BUILTIN_LIBM(modf)
+    #define simde_math_modf(x, iptr) __builtin_modf(x, iptr)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_modf(x, iptr) std::modf(x, iptr)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_modf(x, iptr) modf(x, iptr)
+  #endif
+#endif
+
+#if !defined(simde_math_modff)
+  #if SIMDE_MATH_BUILTIN_LIBM(modff)
+    #define simde_math_modff(x, iptr) __builtin_modff(x, iptr)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_modff(x, iptr) std::modf(x, iptr)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_modff(x, iptr) modff(x, iptr)
+  #endif
+#endif
+
 #if !defined(simde_math_nearbyint)
   #if SIMDE_MATH_BUILTIN_LIBM(nearbyint)
     #define simde_math_nearbyint(v) __builtin_nearbyint(v)
@@ -1254,28 +1189,6 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
     #define simde_math_truncf(v) std::trunc(v)
   #elif defined(SIMDE_MATH_HAVE_MATH_H)
     #define simde_math_truncf(v) truncf(v)
-  #endif
-#endif
-
-/***  Complex functions ***/
-
-#if !defined(simde_math_cexp)
-  #if SIMDE_MATH_BUILTIN_LIBM(cexp)
-    #define simde_math_cexp(v) __builtin_cexp(v)
-  #elif defined(__cplusplus)
-    #define simde_math_cexp(v) std::cexp(v)
-  #elif defined(SIMDE_MATH_HAVE_MATH_H)
-    #define simde_math_cexp(v) cexp(v)
-  #endif
-#endif
-
-#if !defined(simde_math_cexpf)
-  #if SIMDE_MATH_BUILTIN_LIBM(cexpf)
-    #define simde_math_cexpf(v) __builtin_cexpf(v)
-  #elif defined(__cplusplus)
-    #define simde_math_cexpf(v) std::exp(v)
-  #elif defined(SIMDE_MATH_HAVE_MATH_H)
-    #define simde_math_cexpf(v) cexpf(v)
   #endif
 #endif
 

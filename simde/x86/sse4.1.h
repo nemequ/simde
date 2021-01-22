@@ -1020,7 +1020,7 @@ simde_mm_cvtepu32_epi64 (simde__m128i a) {
 
     #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
       r_.neon_u64 = vmovl_u32(vget_low_u32(a_.neon_u32));
-    #elif defined(SIMDE_VECTOR_SCALAR) && (SIMDE_ENDIAN_ORDER == SIMDE_ENDIAN_LITTLE)
+    #elif defined(SIMDE_VECTOR_SCALAR) && defined(SIMDE_SHUFFLE_VECTOR_) && (SIMDE_ENDIAN_ORDER == SIMDE_ENDIAN_LITTLE)
       __typeof__(r_.u32) z = { 0, };
       r_.i64 = HEDLEY_REINTERPRET_CAST(__typeof__(r_.i64), SIMDE_SHUFFLE_VECTOR_(32, 16, a_.u32, z, 0, 4, 1, 6));
     #elif defined(SIMDE_CONVERT_VECTOR_)

@@ -4,6 +4,118 @@
 #include "../../../simde/arm/neon/add.h"
 
 static int
+test_simde_vaddd_s64 (SIMDE_MUNIT_TEST_ARGS) {
+#if 1
+  static const struct {
+    int64_t a;
+    int64_t b;
+    int64_t r;
+  } test_vec[] = {
+    { -INT64_C( 5376176558586261779),
+      -INT64_C( 8975014256303024679),
+       INT64_C( 4095553258820265158) },
+    {  INT64_C( 4193233660194686354),
+       INT64_C( 8392010986138408549),
+      -INT64_C( 5861499427376456713) },
+    { -INT64_C(  498686658264423049),
+      -INT64_C(  235223563850804956),
+      -INT64_C(  733910222115228005) },
+    { -INT64_C( 7287872900825752874),
+      -INT64_C( 5631607047233613604),
+       INT64_C( 5527264125650185138) },
+    {  INT64_C( 4017813484947424424),
+      -INT64_C( 3919207051327069898),
+       INT64_C(   98606433620354526) },
+    { -INT64_C( 3110218261649903353),
+       INT64_C( 1009950248106779417),
+      -INT64_C( 2100268013543123936) },
+    {  INT64_C( 8007005661493138900),
+      -INT64_C( 4253741394523353286),
+       INT64_C( 3753264266969785614) },
+    { -INT64_C( 4311396562388294819),
+       INT64_C( 5057573658044097211),
+       INT64_C(  746177095655802392) }
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])) ; i++) {
+    int64_t r = simde_vaddd_s64(test_vec[i].a, test_vec[i].b);
+
+    simde_assert_equal_i64(r, test_vec[i].r);
+  }
+
+  return 0;
+#else
+  fputc('\n', stdout);
+  for (int i = 0 ; i < 8 ; i++) {
+    int64_t a = simde_test_codegen_random_i64();
+    int64_t b = simde_test_codegen_random_i64();
+    int64_t r = simde_vaddd_s64(a, b);
+
+    simde_test_codegen_write_i64(2, a, SIMDE_TEST_VEC_POS_FIRST);
+    simde_test_codegen_write_i64(2, b, SIMDE_TEST_VEC_POS_MIDDLE);
+    simde_test_codegen_write_i64(2, r, SIMDE_TEST_VEC_POS_LAST);
+  }
+  return 1;
+#endif
+}
+
+static int
+test_simde_vaddd_u64 (SIMDE_MUNIT_TEST_ARGS) {
+#if 1
+  static const struct {
+    uint64_t a;
+    uint64_t b;
+    uint64_t r;
+  } test_vec[] = {
+    { UINT64_C(15770000197539399473),
+      UINT64_C(17536172067039799771),
+      UINT64_C(14859428190869647628) },
+    { UINT64_C(17353057886393621858),
+      UINT64_C( 3930588065693821396),
+      UINT64_C( 2836901878377891638) },
+    { UINT64_C(16195923950262401352),
+      UINT64_C( 3237477675399957348),
+      UINT64_C(  986657551952807084) },
+    { UINT64_C( 8959642801591104818),
+      UINT64_C(17451817626807527669),
+      UINT64_C( 7964716354689080871) },
+    { UINT64_C(12821359242969338377),
+      UINT64_C( 7809127654626125417),
+      UINT64_C( 2183742823885912178) },
+    { UINT64_C(11092975718023534798),
+      UINT64_C( 1022251167223362963),
+      UINT64_C(12115226885246897761) },
+    { UINT64_C( 1266930590655711894),
+      UINT64_C(12040272284058140784),
+      UINT64_C(13307202874713852678) },
+    { UINT64_C(12139750857182669372),
+      UINT64_C( 7482753672160808133),
+      UINT64_C( 1175760455633925889) }
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])) ; i++) {
+    uint64_t r = simde_vaddd_u64(test_vec[i].a, test_vec[i].b);
+
+    simde_assert_equal_u64(r, test_vec[i].r);
+  }
+
+  return 0;
+#else
+  fputc('\n', stdout);
+  for (int i = 0 ; i < 8 ; i++) {
+    uint64_t a = simde_test_codegen_random_u64();
+    uint64_t b = simde_test_codegen_random_u64();
+    uint64_t r = simde_vaddd_u64(a, b);
+
+    simde_test_codegen_write_u64(2, a, SIMDE_TEST_VEC_POS_FIRST);
+    simde_test_codegen_write_u64(2, b, SIMDE_TEST_VEC_POS_MIDDLE);
+    simde_test_codegen_write_u64(2, r, SIMDE_TEST_VEC_POS_LAST);
+  }
+  return 1;
+#endif
+}
+
+static int
 test_simde_vadd_f32 (SIMDE_MUNIT_TEST_ARGS) {
   struct {
     simde_float32 a[2];
@@ -590,7 +702,7 @@ test_simde_vaddq_s8 (SIMDE_MUNIT_TEST_ARGS) {
     simde_int8x16_t a = simde_vld1q_s8(test_vec[i].a);
     simde_int8x16_t b = simde_vld1q_s8(test_vec[i].b);
     simde_int8x16_t r = simde_vaddq_s8(a, b);
-    
+
     simde_test_arm_neon_assert_equal_i8x16(r, simde_vld1q_s8(test_vec[i].r));
   }
 
@@ -926,6 +1038,9 @@ test_simde_vaddq_u64 (SIMDE_MUNIT_TEST_ARGS) {
 }
 
 SIMDE_TEST_FUNC_LIST_BEGIN
+SIMDE_TEST_FUNC_LIST_ENTRY(vaddd_s64)
+SIMDE_TEST_FUNC_LIST_ENTRY(vaddd_u64)
+
 SIMDE_TEST_FUNC_LIST_ENTRY(vadd_f32)
 SIMDE_TEST_FUNC_LIST_ENTRY(vadd_f64)
 SIMDE_TEST_FUNC_LIST_ENTRY(vadd_s8)

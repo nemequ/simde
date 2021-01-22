@@ -103,7 +103,7 @@
 #  define SIMDE_DETECT_CLANG_VERSION_NOT(major, minor, revision) (SIMDE_DETECT_CLANG_VERSION < ((major * 10000) + (minor * 1000) + (revision)))
 #else
 #  define SIMDE_DETECT_CLANG_VERSION_CHECK(major, minor, revision) (0)
-#  define SIMDE_DETECT_CLANG_VERSION_NOT(major, minor, revision) (1)
+#  define SIMDE_DETECT_CLANG_VERSION_NOT(major, minor, revision) (0)
 #endif
 
 #endif /* !defined(SIMDE_DETECT_CLANG_H) */

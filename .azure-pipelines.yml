@@ -5,6 +5,9 @@ trigger:
   branches:
     exclude:
     - master
+    # - ci/*
+    # include:
+    # - ci/azure*
 
 jobs:
 - job: clang_analysis

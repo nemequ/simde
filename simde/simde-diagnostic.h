@@ -181,7 +181,10 @@
  * before we can access certain SIMD intrinsics, but this diagnostic
  * warns about it being a reserved name.  It is a reserved name, but
  * it's reserved for the compiler and we are using it to convey
- * information to the compiler. */
+ * information to the compiler.
+ *
+ * This is also used when enabling native aliases since we don't get to
+ * choose the macro names. */
 #if HEDLEY_HAS_WARNING("-Wdouble-promotion")
   #define SIMDE_DIAGNOSTIC_DISABLE_RESERVED_ID_MACRO_ _Pragma("clang diagnostic ignored \"-Wreserved-id-macro\"")
 #else
@@ -298,7 +301,13 @@
  * -Wc++98-compat-pedantic which says 'long long' is incompatible with
  * C++98. */
 #if HEDLEY_HAS_WARNING("-Wc++98-compat-pedantic")
-  #define SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_ _Pragma("clang diagnostic ignored \"-Wc++98-compat-pedantic\"")
+  #if HEDLEY_HAS_WARNING("-Wc++11-long-long")
+    #define SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_ \
+      _Pragma("clang diagnostic ignored \"-Wc++98-compat-pedantic\"") \
+      _Pragma("clang diagnostic ignored \"-Wc++11-long-long\"")
+  #else
+    #define SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_ _Pragma("clang diagnostic ignored \"-Wc++98-compat-pedantic\"")
+  #endif
 #else
   #define SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #endif
@@ -343,6 +352,19 @@
   #define SIMDE_DIAGNOSTIC_DISABLE_BUGGY_VECTOR_CONVERSION_
 #endif
 
+/* Prior to 5.0, clang didn't support disabling diagnostics in
+ * statement exprs.  As a result, some macros we use don't
+ * properly silence warnings. */
+#if SIMDE_DETECT_CLANG_VERSION_NOT(5,0,0) && HEDLEY_HAS_WARNING("-Wcast-qual") && HEDLEY_HAS_WARNING("-Wcast-align")
+  #define SIMDE_DIAGNOSTIC_DISABLE_BUGGY_CASTS_ _Pragma("clang diagnostic ignored \"-Wcast-qual\"") _Pragma("clang diagnostic ignored \"-Wcast-align\"")
+#elif SIMDE_DETECT_CLANG_VERSION_NOT(5,0,0) && HEDLEY_HAS_WARNING("-Wcast-qual")
+  #define SIMDE_DIAGNOSTIC_DISABLE_BUGGY_CASTS_ _Pragma("clang diagnostic ignored \"-Wcast-qual\"")
+#elif SIMDE_DETECT_CLANG_VERSION_NOT(5,0,0) && HEDLEY_HAS_WARNING("-Wcast-align")
+  #define SIMDE_DIAGNOSTIC_DISABLE_BUGGY_CASTS_ _Pragma("clang diagnostic ignored \"-Wcast-align\"")
+#else
+  #define SIMDE_DIAGNOSTIC_DISABLE_BUGGY_CASTS_
+#endif
+
 /* SLEEF triggers this a *lot* in their headers */
 #if HEDLEY_HAS_WARNING("-Wignored-qualifiers")
   #define SIMDE_DIAGNOSTIC_DISABLE_IGNORED_QUALIFIERS_ _Pragma("clang diagnostic ignored \"-Wignored-qualifiers\"")
@@ -370,7 +392,22 @@
   #define SIMDE_DIAGNOSTIC_DISABLE_UNREACHABLE_
 #endif
 
+/* This is a false positive from GCC in a few places. */
+#if HEDLEY_GCC_VERSION_CHECK(4,7,0)
+  #define SIMDE_DIAGNOSTIC_DISABLE_MAYBE_UNINITIAZILED_ _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+#else
+  #define SIMDE_DIAGNOSTIC_DISABLE_MAYBE_UNINITIAZILED_
+#endif
+
+#if defined(SIMDE_ENABLE_NATIVE_ALIASES)
+  #define SIMDE_DISABLE_UNWANTED_DIAGNOSTICS_NATIVE_ALIASES_ \
+    SIMDE_DIAGNOSTIC_DISABLE_RESERVED_ID_MACRO_
+#else
+  #define SIMDE_DISABLE_UNWANTED_DIAGNOSTICS_NATIVE_ALIASES_
+#endif
+
 #define SIMDE_DISABLE_UNWANTED_DIAGNOSTICS \
+  SIMDE_DISABLE_UNWANTED_DIAGNOSTICS_NATIVE_ALIASES_ \
   SIMDE_DIAGNOSTIC_DISABLE_PSABI_ \
   SIMDE_DIAGNOSTIC_DISABLE_NO_EMMS_INSTRUCTION_ \
   SIMDE_DIAGNOSTIC_DISABLE_SIMD_PRAGMA_DEPRECATED_ \
@@ -385,6 +422,7 @@
   SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_ \
   SIMDE_DIAGNOSTIC_DISABLE_CPP11_LONG_LONG_ \
   SIMDE_DIAGNOSTIC_DISABLE_BUGGY_UNUSED_BUT_SET_VARIBALE_ \
+  SIMDE_DIAGNOSTIC_DISABLE_BUGGY_CASTS_ \
   SIMDE_DIAGNOSTIC_DISABLE_BUGGY_VECTOR_CONVERSION_
 
 #endif /* !defined(SIMDE_DIAGNOSTIC_H) */

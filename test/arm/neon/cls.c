@@ -161,6 +161,10 @@ test_simde_vcls_s32 (SIMDE_MUNIT_TEST_ARGS) {
 #endif
 }
 
+/* clang and GCC are both missing the unsigned versions
+   of these functions.  See https://bugs.llvm.org/show_bug.cgi?id=47407 */
+#if !defined(SIMDE_NATIVE_ALIASES_TESTING)
+
 static int
 test_simde_vcls_u8 (SIMDE_MUNIT_TEST_ARGS) {
 #if 1
@@ -313,6 +317,8 @@ test_simde_vcls_u32 (SIMDE_MUNIT_TEST_ARGS) {
   return 1;
 #endif
 }
+
+#endif
 
 static int
 test_simde_vclsq_s8 (SIMDE_MUNIT_TEST_ARGS) {
@@ -483,6 +489,8 @@ test_simde_vclsq_s32 (SIMDE_MUNIT_TEST_ARGS) {
 #endif
 }
 
+#if !defined(SIMDE_NATIVE_ALIASES_TESTING)
+
 static int
 test_simde_vclsq_u8 (SIMDE_MUNIT_TEST_ARGS) {
 #if 1
@@ -652,20 +660,24 @@ test_simde_vclsq_u32 (SIMDE_MUNIT_TEST_ARGS) {
 #endif
 }
 
+#endif
+
 SIMDE_TEST_FUNC_LIST_BEGIN
 SIMDE_TEST_FUNC_LIST_ENTRY(vcls_s8)
 SIMDE_TEST_FUNC_LIST_ENTRY(vcls_s16)
 SIMDE_TEST_FUNC_LIST_ENTRY(vcls_s32)
-SIMDE_TEST_FUNC_LIST_ENTRY(vcls_u8)
-SIMDE_TEST_FUNC_LIST_ENTRY(vcls_u16)
-SIMDE_TEST_FUNC_LIST_ENTRY(vcls_u32)
-
 SIMDE_TEST_FUNC_LIST_ENTRY(vclsq_s8)
 SIMDE_TEST_FUNC_LIST_ENTRY(vclsq_s16)
 SIMDE_TEST_FUNC_LIST_ENTRY(vclsq_s32)
+
+#if !defined(SIMDE_NATIVE_ALIASES_TESTING)
+SIMDE_TEST_FUNC_LIST_ENTRY(vcls_u8)
+SIMDE_TEST_FUNC_LIST_ENTRY(vcls_u16)
+SIMDE_TEST_FUNC_LIST_ENTRY(vcls_u32)
 SIMDE_TEST_FUNC_LIST_ENTRY(vclsq_u8)
 SIMDE_TEST_FUNC_LIST_ENTRY(vclsq_u16)
 SIMDE_TEST_FUNC_LIST_ENTRY(vclsq_u32)
+#endif
 SIMDE_TEST_FUNC_LIST_END
 
 #include "test-neon-footer.h"
