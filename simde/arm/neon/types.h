@@ -28,6 +28,7 @@
 #define SIMDE_ARM_NEON_TYPES_H
 
 #include "../../simde-common.h"
+#include "../../simde-f16.h"
 
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
@@ -102,6 +103,14 @@ typedef union {
     __m64 m64;
   #endif
 } simde_uint64x1_private;
+
+typedef union {
+  SIMDE_ARM_NEON_DECLARE_VECTOR(simde_float16, values, 8);
+
+  #if defined(SIMDE_X86_MMX_NATIVE)
+    __m64 m64;
+  #endif
+} simde_float16x4_private;
 
 typedef union {
   SIMDE_ARM_NEON_DECLARE_VECTOR(simde_float32, values, 8);
@@ -252,6 +261,22 @@ typedef union {
 } simde_uint64x2_private;
 
 typedef union {
+  SIMDE_ARM_NEON_DECLARE_VECTOR(simde_float16, values, 16);
+
+  #if defined(SIMDE_X86_SSE2_NATIVE)
+    __m128 m128;
+  #endif
+
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    int32x4_t neon;
+  #endif
+
+  #if defined(SIMDE_WASM_SIMD128_NATIVE)
+    v128_t v128;
+  #endif
+} simde_float16x8_private;
+
+typedef union {
   SIMDE_ARM_NEON_DECLARE_VECTOR(simde_float32, values, 16);
 
   #if defined(SIMDE_X86_SSE2_NATIVE)
@@ -367,8 +392,11 @@ typedef union {
   typedef float32x4x4_t simde_float32x4x4_t;
 
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    typedef     float16_t     simde_float16_t;
     typedef     float64_t     simde_float64_t;
+    typedef   float16x4_t   simde_float16x4_t;
     typedef   float64x1_t   simde_float64x1_t;
+    typedef   float16x8_t   simde_float16x8_t;
     typedef   float64x2_t   simde_float64x2_t;
     typedef float64x1x2_t simde_float64x1x2_t;
     typedef float64x2x2_t simde_float64x2x2_t;
@@ -377,8 +405,11 @@ typedef union {
     typedef float64x1x4_t simde_float64x1x4_t;
     typedef float64x2x4_t simde_float64x2x4_t;
   #else
+    #define SIMDE_ARM_NEON_NEED_PORTABLE_F16X4
     #define SIMDE_ARM_NEON_NEED_PORTABLE_F64X1
+    #define SIMDE_ARM_NEON_NEED_PORTABLE_F16X8
     #define SIMDE_ARM_NEON_NEED_PORTABLE_F64X2
+    #define SIMDE_ARM_NEON_NEED_PORTABLE_F16
     #define SIMDE_ARM_NEON_NEED_PORTABLE_F64
     #define SIMDE_ARM_NEON_NEED_PORTABLE_F64X1XN
     #define SIMDE_ARM_NEON_NEED_PORTABLE_F64X2XN
@@ -489,6 +520,7 @@ typedef union {
     #define SIMDE_ARM_NEON_NEED_PORTABLE_F64X2
   #endif
 #elif defined(SIMDE_VECTOR)
+  typedef simde_float16 simde_float16_t;
   typedef simde_float32 simde_float32_t;
   typedef simde_float64 simde_float64_t;
   typedef int8_t          simde_int8x8_t    SIMDE_VECTOR(8);
@@ -499,6 +531,7 @@ typedef union {
   typedef uint16_t        simde_uint16x4_t  SIMDE_VECTOR(8);
   typedef uint32_t        simde_uint32x2_t  SIMDE_VECTOR(8);
   typedef uint64_t        simde_uint64x1_t  SIMDE_VECTOR(8);
+  typedef simde_float16_t simde_float16x4_t SIMDE_VECTOR(8);
   typedef simde_float32_t simde_float32x2_t SIMDE_VECTOR(8);
   typedef simde_float64_t simde_float64x1_t SIMDE_VECTOR(8);
   typedef int8_t          simde_int8x16_t   SIMDE_VECTOR(16);
@@ -509,6 +542,7 @@ typedef union {
   typedef uint16_t        simde_uint16x8_t  SIMDE_VECTOR(16);
   typedef uint32_t        simde_uint32x4_t  SIMDE_VECTOR(16);
   typedef uint64_t        simde_uint64x2_t  SIMDE_VECTOR(16);
+  typedef simde_float16_t simde_float16x8_t SIMDE_VECTOR(16);
   typedef simde_float32_t simde_float32x4_t SIMDE_VECTOR(16);
   typedef simde_float64_t simde_float64x2_t SIMDE_VECTOR(16);
 
@@ -550,6 +584,9 @@ typedef union {
 #if defined(SIMDE_ARM_NEON_NEED_PORTABLE_U64X1) || defined(SIMDE_ARM_NEON_NEED_PORTABLE_64BIT)
   typedef simde_uint64x1_private simde_uint64x1_t;
 #endif
+#if defined(SIMDE_ARM_NEON_NEED_PORTABLE_F16X4) || defined(SIMDE_ARM_NEON_NEED_PORTABLE_64BIT)
+  typedef simde_float16x4_private simde_float16x4_t;
+#endif
 #if defined(SIMDE_ARM_NEON_NEED_PORTABLE_F32X2) || defined(SIMDE_ARM_NEON_NEED_PORTABLE_64BIT)
   typedef simde_float32x2_private simde_float32x2_t;
 #endif
@@ -581,6 +618,9 @@ typedef union {
 #if defined(SIMDE_ARM_NEON_NEED_PORTABLE_U64X2) || defined(SIMDE_ARM_NEON_NEED_PORTABLE_128BIT)
   typedef simde_uint64x2_private simde_uint64x2_t;
 #endif
+#if defined(SIMDE_ARM_NEON_NEED_PORTABLE_F16X8) || defined(SIMDE_ARM_NEON_NEED_PORTABLE_128BIT)
+  typedef simde_float16x8_private simde_float16x8_t;
+#endif
 #if defined(SIMDE_ARM_NEON_NEED_PORTABLE_F32X4) || defined(SIMDE_ARM_NEON_NEED_PORTABLE_128BIT)
   typedef simde_float32x4_private simde_float32x4_t;
 #endif
@@ -588,6 +628,9 @@ typedef union {
   typedef simde_float64x2_private simde_float64x2_t;
 #endif
 
+#if defined(SIMDE_ARM_NEON_NEED_PORTABLE_F16)
+  typedef simde_float16 simde_float16_t;
+#endif
 #if defined(SIMDE_ARM_NEON_NEED_PORTABLE_F32)
   typedef simde_float32 simde_float32_t;
 #endif
@@ -794,6 +837,7 @@ typedef union {
 #endif
 
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  typedef   simde_float16_t     float16_t;
   typedef   simde_float32_t     float32_t;
 
   typedef    simde_int8x8_t      int8x8_t;
@@ -877,8 +921,11 @@ typedef union {
   typedef simde_float32x4x4_t float32x4x4_t;
 #endif
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  typedef   simde_float16_t     float16_t;
   typedef   simde_float64_t     float64_t;
+  typedef simde_float16x4_t   float16x4_t;
   typedef simde_float64x1_t   float64x1_t;
+  typedef simde_float16x8_t   float16x8_t;
   typedef simde_float64x2_t   float64x2_t;
   typedef simde_float64x1x2_t float64x1x2_t;
   typedef simde_float64x2x2_t float64x2x2_t;
@@ -971,6 +1018,7 @@ SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint8x8)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint16x4)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint32x2)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint64x1)
+SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(float16x4)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(float32x2)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(float64x1)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(int8x16)
@@ -981,6 +1029,7 @@ SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint8x16)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint16x8)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint32x4)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(uint64x2)
+SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(float16x8)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(float32x4)
 SIMDE_ARM_NEON_TYPE_DEFINE_CONVERSIONS_(float64x2)
 
