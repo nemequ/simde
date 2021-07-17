@@ -35,6 +35,22 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x4_t
+simde_vld1_f16(simde_float16 const ptr[HEDLEY_ARRAY_PARAM(4)]) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vld1_f16(ptr);
+  #else
+    simde_float16x4_private r_;
+    simde_memcpy(&r_, ptr, sizeof(r_));
+    return simde_float16x4_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vld1_f16
+  #define vld1_f16(a) simde_vld1_f16((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x2_t
 simde_vld1_f32(simde_float32 const ptr[HEDLEY_ARRAY_PARAM(2)]) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
@@ -192,6 +208,26 @@ simde_vld1_u64(uint64_t const ptr[HEDLEY_ARRAY_PARAM(1)]) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vld1_u64
   #define vld1_u64(a) simde_vld1_u64((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x8_t
+simde_vld1q_f16(simde_float16 const ptr[HEDLEY_ARRAY_PARAM(8)]) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vld1q_f16(ptr);
+  #else
+    simde_float16x8_private r_;
+    #if defined(SIMDE_WASM_SIMD128_NATIVE)
+      r_.v128 = wasm_v128_load(ptr);
+    #else
+      simde_memcpy(&r_, ptr, sizeof(r_));
+    #endif
+    return simde_float16x8_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vld1q_f16
+  #define vld1q_f16(a) simde_vld1q_f16((a))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

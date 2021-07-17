@@ -8,8 +8,8 @@ ld = '/usr/bin/llvm-ld-8'
 exe_wrapper = 'qemu-aarch64-static'
 
 [properties]
-c_args = ['--target=aarch64-linux-gnu', '-march=armv8-a+simd', '-isystem=/usr/aarch64-linux-gnu/include', '-Weverything', '-Werror', '-Wno-unused-parameter']
-cpp_args = ['--target=aarch64-linux-gnu', '-march=armv8-a+simd', '-isystem=/usr/aarch64-linux-gnu/include', '-Weverything', '-Werror', '-Wno-unused-parameter']
+c_args = ['--target=aarch64-linux-gnu', '-march=armv8-a+simd+fp16', '-isystem=/usr/aarch64-linux-gnu/include', '-Weverything', '-Werror', '-Wno-unused-parameter']
+cpp_args = ['--target=aarch64-linux-gnu', '-march=armv8-a+simd+fp16', '-isystem=/usr/aarch64-linux-gnu/include', '-Weverything', '-Werror', '-Wno-unused-parameter']
 c_link_args = ['--target=aarch64-linux-gnu']
 cpp_link_args = ['--target=aarch64-linux-gnu']
 

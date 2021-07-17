@@ -4,6 +4,62 @@
 #include "../../../simde/arm/neon/cage.h"
 
 static int
+test_simde_vcageh_f16 (SIMDE_MUNIT_TEST_ARGS) {
+#if 1
+  static const struct {
+    simde_float32 a;
+    simde_float32 b;
+    uint16_t r;
+  } test_vec[] = {
+     { SIMDE_FLOAT32_C(   -68.07),
+      SIMDE_FLOAT32_C(   -41.89),
+           UINT16_MAX },
+    { SIMDE_FLOAT32_C(    94.15),
+      SIMDE_FLOAT32_C(   -23.64),
+           UINT16_MAX },
+    { SIMDE_FLOAT32_C(   -16.98),
+      SIMDE_FLOAT32_C(    36.07),
+      UINT16_C(    0) },
+    { SIMDE_FLOAT32_C(     8.15),
+      SIMDE_FLOAT32_C(   -14.55),
+      UINT16_C(    0) },
+    { SIMDE_FLOAT32_C(   -74.90),
+      SIMDE_FLOAT32_C(    20.98),
+           UINT16_MAX },
+    { SIMDE_FLOAT32_C(   -93.79),
+      SIMDE_FLOAT32_C(    28.02),
+           UINT16_MAX },
+    { SIMDE_FLOAT32_C(   -40.82),
+      SIMDE_FLOAT32_C(    11.37),
+           UINT16_MAX },
+    { SIMDE_FLOAT32_C(    41.99),
+      SIMDE_FLOAT32_C(    40.71),
+           UINT16_MAX }    
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])) ; i++) {
+    uint16_t r = simde_vcageh_f16(simde_float16_from_float32(test_vec[i].a), simde_float16_from_float32(test_vec[i].b));
+
+    simde_assert_equal_u16(r, test_vec[i].r);
+  }
+
+  return 0;
+#else
+  fputc('\n', stdout);
+  for (int i = 0 ; i < 8 ; i++) {
+    simde_float32_t a = simde_test_codegen_random_f32(-100.0f, 100.0f);
+    simde_float32_t b = simde_test_codegen_random_f32(-100.0f, 100.0f);
+    uint16_t r = simde_vcageh_f16(simde_float16_from_float32(a), simde_float16_from_float32(b));
+
+    simde_test_codegen_write_f32(2, a, SIMDE_TEST_VEC_POS_FIRST);
+    simde_test_codegen_write_f32(2, b, SIMDE_TEST_VEC_POS_MIDDLE);
+    simde_test_codegen_write_u16(2, r, SIMDE_TEST_VEC_POS_LAST);
+  }
+  return 1;
+#endif
+}
+
+static int
 test_simde_vcages_f32 (SIMDE_MUNIT_TEST_ARGS) {
 #if 1
   static const struct {
@@ -137,6 +193,38 @@ test_simde_vcaged_f64 (SIMDE_MUNIT_TEST_ARGS) {
   }
   return 1;
 #endif
+}
+
+static int
+test_simde_vcage_f16 (SIMDE_MUNIT_TEST_ARGS) {
+  /*struct {
+    simde_float16 a[4];
+    simde_float16 b[4];
+    uint16_t r[4];
+  } test_vec[] = {
+    
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])) ; i++) {
+    simde_float16x4_t a = simde_vld1_f16(test_vec[i].a);
+    simde_float16x4_t b = simde_vld1_f16(test_vec[i].b);
+    simde_uint16x4_t r = simde_vcage_f16(a, b);
+
+    simde_test_arm_neon_assert_equal_u16x4(r, simde_vld1_u16(test_vec[i].r));
+  }
+
+  return 0;*/
+  fputc('\n', stdout);
+  for (int i = 0 ; i < 8 ; i++) {
+    simde_float32x4_t a = simde_test_arm_neon_random_f32x4(-100.0f, 100.0f);
+    simde_float32x4_t b = simde_test_arm_neon_random_f32x4(-100.0f, 100.0f);
+    simde_uint16x4_t r = simde_vcage_f16(simde_float16_from_float32(a), simde_float16_from_float32(b));
+
+    simde_test_codegen_write_f32(2, a, SIMDE_TEST_VEC_POS_FIRST);
+    simde_test_codegen_write_f32(2, b, SIMDE_TEST_VEC_POS_MIDDLE);
+    simde_test_codegen_write_u16(2, r, SIMDE_TEST_VEC_POS_LAST);
+  }
+  return 1;
 }
 
 static int
@@ -315,6 +403,7 @@ test_simde_vcageq_f64 (SIMDE_MUNIT_TEST_ARGS) {
 }
 
 SIMDE_TEST_FUNC_LIST_BEGIN
+SIMDE_TEST_FUNC_LIST_ENTRY(vcageh_f16)
 SIMDE_TEST_FUNC_LIST_ENTRY(vcages_f32)
 SIMDE_TEST_FUNC_LIST_ENTRY(vcaged_f64)
 

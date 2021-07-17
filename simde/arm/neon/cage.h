@@ -37,6 +37,22 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
+uint16_t
+simde_vcageh_f16(simde_float16_t a, simde_float16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vcageh_f16(a, b);
+  #else
+    simde_float32_t a_ = simde_float16_to_float32(a);
+    simde_float32_t b_ = simde_float16_to_float32(b);
+    return (simde_math_fabsf(a_) >= simde_math_fabsf(b_)) ? UINT16_MAX : UINT16_C(0);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vcageh_f16
+  #define vcageh_f16(a, b) simde_vcageh_f16((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 uint32_t
 simde_vcages_f32(simde_float32_t a, simde_float32_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
@@ -62,6 +78,30 @@ simde_vcaged_f64(simde_float64_t a, simde_float64_t b) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vcaged_f64
   #define vcaged_f64(a, b) simde_vcaged_f64((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint16x4_t
+simde_vcage_f16(simde_float16x4_t a, simde_float16x4_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE)
+    return vcage_f16(a, b);
+  #else
+    simde_float16x4_private 
+      a_ = simde_float16x4_to_private(a),
+      b_ = simde_float16x4_to_private(b);
+    simde_uint16x4_private r_;
+
+    SIMDE_VECTORIZE
+    for(size_t i = 0 ; i < (sizeof(r_) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = simde_vcageh_f16(a_.values[i], b_.values[i]);
+    }
+
+    return simde_uint16x4_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vcage_f16
+  #define vcage_f16(a, b) simde_vcage_f16((a), (b))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
