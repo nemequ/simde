@@ -94,6 +94,243 @@ SIMDE_BEGIN_DECLS_
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+int
+simde_mm_cmpestra_8_(simde__m128i a, int la, simde__m128i b, int lb, const int imm8)
+  SIMDE_REQUIRE_CONSTANT_RANGE(imm8, 0, 255) {
+  const int cmp_op = imm8 & 0x0c;
+  const int polarity = imm8 & 0x30;
+  simde__m128i_private
+    bool_res_ = simde__m128i_to_private(simde_mm_setzero_si128()),
+    a_ = simde__m128i_to_private(a),
+    b_ = simde__m128i_to_private(b);
+  const int upper_bound = (128 / 8) - 1;
+  int a_invalid = 0;
+  int b_invalid = 0;
+  for(int i = 0 ; i <= upper_bound ; i++) {
+    for(int j = 0; j <= upper_bound ; j++){
+      int bitvalue = ((a_.i8[i] == b_.i8[j]) ? 1 : 0);
+      if(i == la)
+        a_invalid = 1;
+      if(j == lb)
+        b_invalid = 1;
+      switch(cmp_op){
+        case SIMDE_SIDD_CMP_EQUAL_ANY:
+        case SIMDE_SIDD_CMP_RANGES:
+          if(!a_invalid && !b_invalid);
+          else
+            bitvalue = 0;
+          break;
+        case SIMDE_SIDD_CMP_EQUAL_EACH:
+          if(!a_invalid && !b_invalid);
+          else if(a_invalid && b_invalid)
+            bitvalue = 1;
+          else
+            bitvalue = 0;
+          break;
+        case SIMDE_SIDD_CMP_EQUAL_ORDERED:
+          if(!a_invalid && !b_invalid);
+          else if(a_invalid && !b_invalid)
+            bitvalue = 1;
+          else if(a_invalid && b_invalid)
+            bitvalue = 1;
+          else
+            bitvalue = 0;
+          break;
+      }
+      bool_res_.i8[i] |= (bitvalue << j);
+    }
+  }
+  int32_t int_res_1 = 0;
+  int32_t int_res_2 = 0;
+  switch(cmp_op) {
+    case SIMDE_SIDD_CMP_EQUAL_ANY:
+      for(int i = 0 ; i <= upper_bound ; i++){
+        SIMDE_VECTORIZE_REDUCTION(|:int_res_1)
+        for(int j = 0 ; j <= upper_bound ; j++){
+          int_res_1 |= (((bool_res_.i8[i] >> j) & 1) << i);
+        }
+      }
+      break;
+    case SIMDE_SIDD_CMP_RANGES:
+      for(int i = 0 ; i <= upper_bound ; i++){
+        SIMDE_VECTORIZE_REDUCTION(|:int_res_1)
+        for(int j = 0 ; j <= upper_bound ; j++){
+          int_res_1 |= ((((bool_res_.i8[i] >> j) & 1) & ((bool_res_.i8[i] >> (j + 1)) & 1)) << i);
+          j += 2;
+        }
+      }
+      break;
+    case SIMDE_SIDD_CMP_EQUAL_EACH:
+      SIMDE_VECTORIZE_REDUCTION(|:int_res_1)
+      for(int i = 0 ; i <= upper_bound ; i++){
+          int_res_1 |= (((bool_res_.i8[i] >> i) & 1) << i);
+      }
+      break;
+    case SIMDE_SIDD_CMP_EQUAL_ORDERED:
+      int_res_1 = 0xff;
+      for(int i = 0 ; i <= upper_bound ; i++){
+        int k = i;
+        HEDLEY_DIAGNOSTIC_PUSH
+        #if defined(SIMDE_BUG_CLANG_45959)
+          #pragma clang diagnostic ignored "-Wsign-conversion"
+        #endif
+        SIMDE_VECTORIZE_REDUCTION(&:int_res_1)
+        for(int j = 0 ; j <= (upper_bound-i) ; j++){
+          int_res_1 &=  (((bool_res_.i8[k] >> j) & 1 ) << i) ;
+          k += 1;
+        }
+        HEDLEY_DIAGNOSTIC_POP
+      }
+      break;
+  }
+  for(int i = 0; i <= upper_bound ; i++){
+    if(polarity & SIMDE_SIDD_NEGATIVE_POLARITY){
+      if(polarity & SIMDE_SIDD_MASKED_POSITIVE_POLARITY) {
+        if (i >= lb) {
+          int_res_2 |= (((int_res_1 >> i) & 1) << i);
+        }
+        else {
+          int_res_2 |= ((((int_res_1 >> i) & 1) ^ (-1)) << i);
+        }
+      }
+      else{
+        int_res_2 |= ((((int_res_1 >> i) & 1) ^ (-1)) << i);
+      }
+    }
+    else{
+      int_res_2 |= ( ((int_res_1 >> i) & 1) << i);
+    }
+  }
+  return !int_res_2 & (lb > upper_bound);
+}
+
+SIMDE_FUNCTION_ATTRIBUTES
+int
+simde_mm_cmpestra_16_(simde__m128i a, int la, simde__m128i b, int lb, const int imm8)
+  SIMDE_REQUIRE_CONSTANT_RANGE(imm8, 0, 255) {
+  const int cmp_op = imm8 & 0x0c;
+  const int polarity = imm8 & 0x30;
+  simde__m128i_private
+    bool_res_ = simde__m128i_to_private(simde_mm_setzero_si128()),
+    a_ = simde__m128i_to_private(a),
+    b_ = simde__m128i_to_private(b);
+  const int upper_bound = (128 / 16) - 1;
+  int a_invalid = 0;
+  int b_invalid = 0;
+  for(int i = 0 ; i <= upper_bound ; i++) {
+    for(int j = 0; j <= upper_bound ; j++)
+    {
+      int bitvalue = ((a_.i16[i] == b_.i16[j]) ? 1 : 0);
+      a_invalid = 0;
+      b_invalid = 0;
+      if(i >= la)
+        a_invalid = 1;
+      if(j >= lb)
+        b_invalid = 1;
+      switch(cmp_op){
+        case SIMDE_SIDD_CMP_EQUAL_ANY:
+        case SIMDE_SIDD_CMP_RANGES:
+          if(!a_invalid && !b_invalid);
+          else
+            bitvalue = 0;
+          break;
+        case SIMDE_SIDD_CMP_EQUAL_EACH:
+          if(!a_invalid && !b_invalid);
+          else if(a_invalid && b_invalid)
+            bitvalue = 1;
+          else
+            bitvalue = 0;
+          break;
+        case SIMDE_SIDD_CMP_EQUAL_ORDERED:
+          if(!a_invalid && !b_invalid);
+          else if(a_invalid && !b_invalid)
+            bitvalue = 1;
+          else if(a_invalid && b_invalid)
+            bitvalue = 1;
+          else
+            bitvalue = 0;
+          break;
+      }
+      bool_res_.i16[i] |= (bitvalue << j);
+    }
+  }
+  int32_t int_res_1 = 0;
+  int32_t int_res_2 = 0;
+  switch(cmp_op) {
+    case SIMDE_SIDD_CMP_EQUAL_ANY:
+      for(int i = 0 ; i <= upper_bound ; i++){
+        SIMDE_VECTORIZE_REDUCTION(|:int_res_1)
+        for (int j = 0 ; j <= upper_bound ; j++){
+          int_res_1 |= (((bool_res_.i16[i] >> j) & 1) << i) ;
+        }
+      }
+      break;
+    case SIMDE_SIDD_CMP_RANGES:
+      for(int i = 0 ; i <= upper_bound ; i++){
+        SIMDE_VECTORIZE_REDUCTION(|:int_res_1)
+        for(int j = 0 ; j <= upper_bound ; j++){
+          int_res_1 |= ((((bool_res_.i16[i] >> j) & 1) & ((bool_res_.i16[i] >> (j + 1)) & 1)) << i);
+          j += 2;
+        }
+      }
+      break;
+    case SIMDE_SIDD_CMP_EQUAL_EACH:
+      SIMDE_VECTORIZE_REDUCTION(|:int_res_1)
+      for(int i = 0 ; i <= upper_bound ; i++){
+          int_res_1 |= (((bool_res_.i16[i] >> i) & 1) << i);
+      }
+      break;
+    case SIMDE_SIDD_CMP_EQUAL_ORDERED:
+      int_res_1 = 0xffff;
+      for(int i = 0 ; i <= upper_bound ; i++){
+        int k = i;
+        HEDLEY_DIAGNOSTIC_PUSH
+        #if defined(SIMDE_BUG_CLANG_45959)
+          #pragma clang diagnostic ignored "-Wsign-conversion"
+        #endif
+        SIMDE_VECTORIZE_REDUCTION(&:int_res_1)
+        for(int j = 0 ; j <= (upper_bound-i) ; j++){
+          int_res_1 &= (((bool_res_.i16[k] >> j) & 1) << i) ;
+          k += 1;
+        }
+        HEDLEY_DIAGNOSTIC_POP
+      }
+      break;
+  }
+  for(int i = 0; i <= upper_bound ; i++){
+    if(polarity & SIMDE_SIDD_NEGATIVE_POLARITY){
+      if(polarity & SIMDE_SIDD_MASKED_POSITIVE_POLARITY) {
+        if (i >= lb) {
+          int_res_2 |= (((int_res_1 >> i) & 1) << i);
+        }
+        else {
+          int_res_2 |= ((((int_res_1 >> i) & 1) ^ (-1)) << i);
+        }
+      }
+      else{
+        int_res_2 |= ((((int_res_1 >> i) & 1) ^ (-1)) << i);
+      }
+    }
+    else{
+      int_res_2 |= (((int_res_1 >> i) & 1) << i);
+    }
+  }
+  return !int_res_2 & (lb > upper_bound);
+}
+
+#if defined(SIMDE_X86_SSE4_2_NATIVE)
+  #define simde_mm_cmpestra(a, la, b, lb, imm8) _mm_cmpestra(a, la, b, lb, imm8)
+#else
+  #define simde_mm_cmpestra(a, la, b, lb, imm8) \
+     (((imm8) & SIMDE_SIDD_UWORD_OPS) \
+       ? simde_mm_cmpestra_16_((a), (la), (b), (lb), (imm8)) \
+       : simde_mm_cmpestra_8_((a), (la), (b), (lb), (imm8)))
+#endif
+#if defined(SIMDE_X86_SSE4_2_ENABLE_NATIVE_ALIASES)
+  #define _mm_cmpestra(a, la, b, lb, imm8) simde_mm_cmpestra(a, la, b, lb, imm8)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 int simde_mm_cmpestrs (simde__m128i a, int la, simde__m128i b, int lb, const int imm8)
     SIMDE_REQUIRE_CONSTANT_RANGE(imm8, 0, 255) {
   #if !defined(HEDLEY_PGI_VERSION)

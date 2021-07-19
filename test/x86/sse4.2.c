@@ -26,6 +26,36 @@
 #include <simde/x86/sse4.2.h>
 
 static int
+test_simde_mm_cmpestra_ranges_8(SIMDE_MUNIT_TEST_ARGS) {
+  const struct {
+    simde__m128i a;
+    int la;
+    simde__m128i b;
+    int lb;
+    int r;
+  } test_vec[] = {
+      { simde_mm_set_epi8(INT8_C(  45), INT8_C( -94), INT8_C(  38), INT8_C( -11),
+                        INT8_C(  84), INT8_C(-123), INT8_C( -43), INT8_C( -49),
+                        INT8_C(  25), INT8_C( -55), INT8_C(-121), INT8_C(  -6),
+                        INT8_C(  57), INT8_C( 108), INT8_C( -55), INT8_C(  69)),
+      23 ,
+      simde_mm_set_epi8(INT8_C( -26), INT8_C( -61), INT8_C( -21), INT8_C( -96),
+                        INT8_C(  48), INT8_C(-112), INT8_C(  95), INT8_C( -56),
+                        INT8_C(  29), INT8_C( -55), INT8_C(-121), INT8_C(  -6),
+                        INT8_C(  57), INT8_C( 108), INT8_C( -55), INT8_C(  69)),
+      28 ,
+      0 }
+  };
+
+  for (size_t i = 0 ; i < (sizeof(test_vec) / sizeof(test_vec[0])); i++) {
+    int r = simde_mm_cmpestra(test_vec[i].a, test_vec[i].la, test_vec[i].b, test_vec[i].lb, 36);
+    simde_assert_equal_i(r, test_vec[i].r);
+  }
+
+  return 0;
+}
+
+static int
 test_simde_mm_cmpestrs_8(SIMDE_MUNIT_TEST_ARGS) {
   const struct {
     simde__m128i a;
@@ -1064,6 +1094,7 @@ test_simde_mm_crc32_u64 (SIMDE_MUNIT_TEST_ARGS) {
 }
 
 SIMDE_TEST_FUNC_LIST_BEGIN
+  SIMDE_TEST_FUNC_LIST_ENTRY(mm_cmpestra_ranges_8)
   SIMDE_TEST_FUNC_LIST_ENTRY(mm_cmpestrs_8)
   SIMDE_TEST_FUNC_LIST_ENTRY(mm_cmpestrs_16)
   SIMDE_TEST_FUNC_LIST_ENTRY(mm_cmpestrz_8)
